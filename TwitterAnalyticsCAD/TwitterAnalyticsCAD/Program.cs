@@ -10,7 +10,6 @@ namespace TwitterAnalyticsCAD
     {
         static void Main(string[] args)
         {
-            //CAD project
         }
     }
 }
