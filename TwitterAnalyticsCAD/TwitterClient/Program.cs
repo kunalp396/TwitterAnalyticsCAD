@@ -40,7 +40,7 @@ namespace TwitterClient
                 var myEventHubObserver = new EventHubObserver(config);
 
                 var datum = Tweet.StreamStatuses(new TwitterConfig(oauthToken, oauthTokenSecret, oauthCustomerKey, oauthConsumerSecret,
-                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic, SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone });
+                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic, SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone, TweetText= tweet.Text,Retweeted=tweet.Retweeted, RetweetCount=tweet.RetweetCount});
 
                 datum.ToObservable().Subscribe(myEventHubObserver);
             }

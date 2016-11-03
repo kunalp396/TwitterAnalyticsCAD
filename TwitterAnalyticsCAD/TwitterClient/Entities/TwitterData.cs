@@ -181,6 +181,8 @@ namespace TwitterClient
         public string Language;
         public string Topic;
         public int SentimentScore;
+        public bool Retweeted;
+        public string RetweetCount;
 
         public string RawJson;
 
@@ -196,7 +198,11 @@ namespace TwitterClient
         public string Topic;
         public int SentimentScore;
         public string PlaceTimeZone;
-                
+        public string TweetText;
+        public bool Retweeted;
+        public string RetweetCount;
+
+
         public override string ToString()
         {
             return new {  CreatedAt,  Topic, SentimentScore }.ToString();
