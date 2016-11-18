@@ -10,12 +10,13 @@
 //*********************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
+using TwitterAnalyticsCommon;
+using System.Data.SqlClient;
+using System.Data;
+using System.Collections.Generic;
 
 namespace TwitterClient
 {
@@ -25,7 +26,7 @@ namespace TwitterClient
         {
             try
             {
-
+                
                 //Configure Twitter OAuth
                 var oauthToken = ConfigurationManager.AppSettings["oauth_token"];
                 var oauthTokenSecret = ConfigurationManager.AppSettings["oauth_token_secret"];
@@ -40,7 +41,7 @@ namespace TwitterClient
                 var myEventHubObserver = new EventHubObserver(config);
 
                 var datum = Tweet.StreamStatuses(new TwitterConfig(oauthToken, oauthTokenSecret, oauthCustomerKey, oauthConsumerSecret,
-                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic, SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone, TweetText= tweet.Text,Retweeted=tweet.Retweeted, RetweetCount=tweet.RetweetCount});
+                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Where(tweet=>tweet.Topic!="Unknown").Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic, SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone, TweetText= tweet.Text,Retweeted=tweet.Retweeted, RetweetCount=tweet.RetweetCount});
 
                 datum.ToObservable().Subscribe(myEventHubObserver);
             }

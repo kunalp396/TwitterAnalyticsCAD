@@ -23,6 +23,9 @@ namespace TwitterAnalyticsWeb
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/highchart").Include(
+                    "~/Scripts/Highcharts-4.0.1/js/highcharts*"));
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
