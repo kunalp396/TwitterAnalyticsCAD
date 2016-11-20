@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterClient", "TwitterCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsCommon", "TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj", "{22C54712-8933-4BDB-8C76-54910D6BEABA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsDBL", "TwitterAnalyticsDBL\TwitterAnalyticsDBL.csproj", "{670CC8D5-500F-4288-98DC-6591668D854F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670CC8D5-500F-4288-98DC-6591668D854F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670CC8D5-500F-4288-98DC-6591668D854F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670CC8D5-500F-4288-98DC-6591668D854F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670CC8D5-500F-4288-98DC-6591668D854F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

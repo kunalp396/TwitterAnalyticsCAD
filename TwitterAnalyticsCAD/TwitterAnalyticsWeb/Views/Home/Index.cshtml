@@ -2,15 +2,36 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>Twitter Real Time Data Analysis</h1>
-    <p class="lead"> CSS and JavaScript.</p>
-    
-</div>
 
-<div class="row">
-    <div class="col-md-4">
-             
-    </div>
-   
+<div class="jumbotron">
+    <h3>Twitter Real Time Data Analysis</h3>
 </div>
+<div class="row">
+    <div id="FinalGraph" class="col-md-7">
+        @DateTime.Now.ToString(); <br />
+        @{
+
+            Html.RenderAction("FinalGraph", "ChartSample");
+        }
+    </div>
+    <div class="col-md-5">
+        another table
+    </div>
+
+</div>
+<script>
+$(document).ready(function() {
+  $.ajaxSetup({ cache: false }); // This part addresses an IE bug.  without it, IE will only load the first number and will never refresh
+  setInterval(function () {
+      //alert($(window).scrollTop());
+      var scrollPosition = $(window).scrollTop();
+      $('#FinalGraph').load('@(Url.Action("FinalGraph", "ChartSample", null, Request.Url.Scheme))', function () {
+          $(window).scrollTop(scrollPosition);         
+      });
+     
+            }, 5000); // the "3000"
+});
+    
+
+    
+</script>

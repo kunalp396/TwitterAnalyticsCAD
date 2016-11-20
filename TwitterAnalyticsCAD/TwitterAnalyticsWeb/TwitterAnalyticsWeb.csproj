@@ -319,6 +319,10 @@
       <Project>{22c54712-8933-4bdb-8c76-54910d6beaba}</Project>
       <Name>TwitterAnalyticsCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TwitterAnalyticsDBL\TwitterAnalyticsDBL.csproj">
+      <Project>{670cc8d5-500f-4288-98dc-6591668d854f}</Project>
+      <Name>TwitterAnalyticsDBL</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
