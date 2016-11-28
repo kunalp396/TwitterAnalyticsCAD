@@ -1,0 +1,85 @@
+﻿@model TwitterAnalyticsWeb.Models.FilterCriteria
+
+@{
+    ViewBag.Title = "FilterCriteria";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Filter Criteria</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+       
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Topics, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Topics, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Topics, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Duration, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.Duration, new SelectList(Model.Duration, "Value", "Text", "15 min"), new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.TimeZone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.TimeZone,new SelectList(Model.TimeZone,"Value","Text","All"), new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Start Analysis" name="StartAnalysis" id="StartAnalysis" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts {
+    <!--Script references. -->
+    <!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
+    <!--Reference the SignalR library. -->
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <!--SignalR script to update the chat page and send messages.-->
+    <script>
+        $(function () {
+            // Reference the auto-generated proxy for the hub.
+            var chat = $.connection.liveTweetsPushNotification;
+            // Create a function that the hub can call back to display messages.
+            
+
+            $.connection.hub.start().done(function () {
+
+                // Call the Send method on the hub.
+                $("#StartAnalysis").click(function () {
+                   
+                    var topics = $("#Topics").val();
+                    if (topics!=null && topics.trim()!='') {
+                        var duration = $("#Duration").val();
+                        var timeZone = $("#TimeZone").val();
+                        chat.server.setAnalyzeParameters(topics, duration, timeZone);
+                    }
+
+                });
+
+                
+               
+
+            });
+        });
+        
+    </script>
+}

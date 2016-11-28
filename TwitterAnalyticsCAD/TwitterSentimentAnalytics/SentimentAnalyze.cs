@@ -21,6 +21,8 @@ namespace TwitterClient
 {
     public static class Sentiment
     {
+        private static string sentimentURIFormatter = "http://www.sentiment140.com/api/classify?text={0}";
+
         public static TwitterPayload ComputeScore(Tweet tweet, string twitterKeywords)
         {
 
@@ -37,7 +39,7 @@ namespace TwitterClient
                 Language = tweet.Language != null ? tweet.Language : "(unknown)",
                 RawJson = tweet.RawJson,
                 SentimentScore = (int)Analyze(tweet.Text),
-                Topic = DetermineTopc(tweet.Text, twitterKeywords),
+                Topic = DetermineTopic(tweet.Text, twitterKeywords),
             };
         }
 
@@ -54,7 +56,7 @@ namespace TwitterClient
                 return DateTime.Now;
         }
 
-        enum SentimentScore
+        public enum SentimentScore
         {
             Positive = 4,
             Neutral = 2,
@@ -62,11 +64,11 @@ namespace TwitterClient
             Undefined = -1
         }
 
-        static SentimentScore Analyze(string textToAnalyze)
+        public static SentimentScore Analyze(string textToAnalyze)
         {
             try
             {
-                string url = string.Format("http://www.sentiment140.com/api/classify?text={0}",
+                string url = string.Format(sentimentURIFormatter,
                                             HttpUtility.UrlEncode(textToAnalyze, Encoding.UTF8));
                 var response = HttpWebRequest.Create(url).GetResponse();
 
@@ -97,7 +99,7 @@ namespace TwitterClient
             }
             catch (Exception e)
             {
-                Console.WriteLine("Sentiment calculation FAILED with:/n{0}", e);
+                //Console.WriteLine("Sentiment calculation FAILED with:/n{0}", e);
                 return SentimentScore.Neutral;
             }
         }
@@ -108,7 +110,7 @@ namespace TwitterClient
         /// <param name="tweetText"></param>
         /// <param name="keywordFilters"></param>
         /// <returns></returns>
-        static string DetermineTopc(string tweetText, string keywordFilters)
+        public static string DetermineTopic(string tweetText, string keywordFilters)
         {
             if (string.IsNullOrEmpty(tweetText))
                 return string.Empty;
@@ -122,11 +124,7 @@ namespace TwitterClient
             foreach (string keyPhrase in keyPhrases)
             {
                 subject = keyPhrase;
-
-                //a key phrase may have multiple key words, like: Windows Phone.  If this is the case we will only assign it a subject if both words are 
-                //included and in the correct order. For example, a tweet will match if "Windows 8" is found within the tweet but will not match if
-                // the tweet is "There were 8 broken Windows".  This is not case sensitive
-
+                
                 //Creates one array that breaks the tweet into individual words and one array that breaks the key phrase into individual words.  Within 
                 //This for loop another array is created from the tweet that includes the same number of words as the keyphrase.  These are compared.  For example,
                 // KeyPhrase = "Microsoft Office" Tweet= "I Love Microsoft Office"  "Microsoft Office" will be compared to "I Love" then "Love Microsoft" and 

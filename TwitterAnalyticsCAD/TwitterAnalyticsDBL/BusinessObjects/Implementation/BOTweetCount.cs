@@ -25,55 +25,28 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		protected Int32? _retweetCount;
 		protected DateTime? _createdAt;
 		protected bool _isDirty = false;
-		/*collection member objects*******************/
-		/*********************************************/
-		#endregion
+        protected int _totalCount;
 
-		#region class methods
-		///<Summary>
-		///Constructor
-		///This is the default constructor
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public BOTweetCount()
+        /*collection member objects*******************/
+        /*********************************************/
+        #endregion
+
+        #region class methods
+        ///<Summary>
+        ///Constructor
+        ///This is the default constructor
+        ///</Summary>
+        ///<returns>
+        ///void
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public BOTweetCount()
 		{
 		}
 
-		///<Summary>
-		///Constructor
-		///Constructor using primary key(s)
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///Int64 id
-		///</parameters>
-		public BOTweetCount(Int64 id)
-		{
-			try
-			{
-				DAOTweetCount daoTweetCount = DAOTweetCount.SelectOne(id);
-				_id = daoTweetCount.Id;
-				_topic = daoTweetCount.Topic;
-				_sentimentScore = daoTweetCount.SentimentScore;
-				_placeTimeZone = daoTweetCount.PlaceTimeZone;
-				_tweetText = daoTweetCount.TweetText;
-				_retweeted = daoTweetCount.Retweeted;
-				_retweetCount = daoTweetCount.RetweetCount;
-				_createdAt = daoTweetCount.CreatedAt;
-			}
-			catch
-			{
-				throw;
-			}
-		}
-
+		
 		///<Summary>
 		///Constructor
 		///This constructor initializes the business object from its respective data object
@@ -96,6 +69,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_retweeted = daoTweetCount.Retweeted;
 				_retweetCount = daoTweetCount.RetweetCount;
 				_createdAt = daoTweetCount.CreatedAt;
+                _totalCount = daoTweetCount.TotalCount;
 			}
 			catch
 			{
@@ -103,49 +77,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 		}
 
-		///<Summary>
-		///SaveNew
-		///This method persists a new TweetCount record to the store
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public virtual void SaveNew()
-		{
-			DAOTweetCount daoTweetCount = new DAOTweetCount();
-			RegisterDataObject(daoTweetCount);
-			BeginTransaction("savenewBOTweetCount");
-			try
-			{
-				daoTweetCount.Topic = _topic;
-				daoTweetCount.SentimentScore = _sentimentScore;
-				daoTweetCount.PlaceTimeZone = _placeTimeZone;
-				daoTweetCount.TweetText = _tweetText;
-				daoTweetCount.Retweeted = _retweeted;
-				daoTweetCount.RetweetCount = _retweetCount;
-				daoTweetCount.CreatedAt = _createdAt;
-				daoTweetCount.Insert();
-				CommitTransaction();
-				
-				_id = daoTweetCount.Id;
-				_topic = daoTweetCount.Topic;
-				_sentimentScore = daoTweetCount.SentimentScore;
-				_placeTimeZone = daoTweetCount.PlaceTimeZone;
-				_tweetText = daoTweetCount.TweetText;
-				_retweeted = daoTweetCount.Retweeted;
-				_retweetCount = daoTweetCount.RetweetCount;
-				_createdAt = daoTweetCount.CreatedAt;
-				_isDirty = false;
-			}
-			catch
-			{
-				RollbackTransaction("savenewBOTweetCount");
-				throw;
-			}
-		}
+		
 		
 		///<Summary>
 		///Update
@@ -191,33 +123,6 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				throw;
 			}
 		}
-		///<Summary>
-		///Delete
-		///This method deletes one TweetCount record from the store
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public virtual void Delete()
-		{
-			DAOTweetCount daoTweetCount = new DAOTweetCount();
-			RegisterDataObject(daoTweetCount);
-			BeginTransaction("deleteBOTweetCount");
-			try
-			{
-				daoTweetCount.Id = _id;
-				daoTweetCount.Delete();
-				CommitTransaction();
-			}
-			catch
-			{
-				RollbackTransaction("deleteBOTweetCount");
-				throw;
-			}
-		}
 		
 		///<Summary>
 		///TweetCountCollection
@@ -246,19 +151,47 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				throw ex;
 			}
 		}
-		
-		
-		///<Summary>
-		///TweetCountCollectionCount
-		///This method returns the collection count of BOTweetCount objects
+
+        ///<Summary>
+		///TweetCountCollection
+		///This method returns the collection of BOTweetCount objects
 		///</Summary>
 		///<returns>
-		///Int32
+		///List[BOTweetCount]
 		///</returns>
 		///<parameters>
 		///
 		///</parameters>
-		public static Int32 TweetCountCollectionCount()
+		public static IList<BOTweetCount> TweetCountGetTweetsGreatorThanId(long Id)
+        {
+            try
+            {
+                IList<BOTweetCount> boTweetCountCollection = new List<BOTweetCount>();
+                IList<DAOTweetCount> daoTweetCountCollection = DAOTweetCount.SelectAllTweetGreaterThanId(Id);
+
+                foreach (DAOTweetCount daoTweetCount in daoTweetCountCollection)
+                    boTweetCountCollection.Add(new BOTweetCount(daoTweetCount));
+
+                return boTweetCountCollection;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+        ///<Summary>
+        ///TweetCountCollectionCount
+        ///This method returns the collection count of BOTweetCount objects
+        ///</Summary>
+        ///<returns>
+        ///Int32
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static Int32 TweetCountCollectionCount()
 		{
 			try
 			{
@@ -308,19 +241,48 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				throw;
 			}
 		}
-		
-		
-		///<Summary>
-		///TweetCountCollectionFromSearchFieldsCount
-		///This method returns the collection count of BOTweetCount objects, filtered by a search object
+
+        ///<Summary>
+		///TweetCountGetTopics
+		///This method returns the collection of BOTweetCount objects, filtered by a search object
 		///</Summary>
 		///<returns>
-		///Int32
+		///List<BOTweetCount>
 		///</returns>
 		///<parameters>
 		///
 		///</parameters>
-		public static Int32 TweetCountCollectionFromSearchFieldsCount(BOTweetCount boTweetCount)
+		public static IList<BOTweetCount> TweetCountGetTopics()
+        {
+            try
+            {
+                IList<BOTweetCount> boTweetCountCollection = new List<BOTweetCount>();
+             
+                IList<DAOTweetCount> daoTweetCountCollection = DAOTweetCount.TweetCountGetTopics();
+
+                foreach (DAOTweetCount resdaoTweetCount in daoTweetCountCollection)
+                    boTweetCountCollection.Add(new BOTweetCount(resdaoTweetCount));
+
+                return boTweetCountCollection;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+
+        ///<Summary>
+        ///TweetCountCollectionFromSearchFieldsCount
+        ///This method returns the collection count of BOTweetCount objects, filtered by a search object
+        ///</Summary>
+        ///<returns>
+        ///Int32
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static Int32 TweetCountCollectionFromSearchFieldsCount(BOTweetCount boTweetCount)
 		{
 			try
 			{
@@ -423,8 +385,21 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_isDirty = true;
 			}
 		}
-		
-		public virtual Int32? RetweetCount
+
+        public virtual Int32 TotalCount
+        {
+            get
+            {
+                return _totalCount;
+            }
+            set
+            {
+                _totalCount = value;
+                _isDirty = true;
+            }
+        }
+
+        public virtual Int32? RetweetCount
 		{
 			get
 			{

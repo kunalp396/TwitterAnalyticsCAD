@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{670CC8D5-500F-4288-98DC-6591668D854F}</ProjectGuid>
+    <ProjectGuid>{06549B3E-8961-40F4-A3F7-74D69BC3F9AF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TwitterAnalyticsDBL</RootNamespace>
-    <AssemblyName>TwitterAnalyticsDBL</AssemblyName>
+    <RootNamespace>TwitterSentimentAnalytics</RootNamespace>
+    <AssemblyName>TwitterSentimentAnalytics</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,9 +30,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.2-beta1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net45\System.Reactive.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,25 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessObjects\Implementation\AzureSQLDBConn_BaseBusiness.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTimeZone.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetCount.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetMentions.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_BaseData.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_TxConnectionProvider.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTimeZone.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetCount.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetMentions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SentimentAnalyze.cs" />
+    <Compile Include="TwitterData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
-      <Project>{22C54712-8933-4BDB-8C76-54910D6BEABA}</Project>
-      <Name>TwitterAnalyticsCommon</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

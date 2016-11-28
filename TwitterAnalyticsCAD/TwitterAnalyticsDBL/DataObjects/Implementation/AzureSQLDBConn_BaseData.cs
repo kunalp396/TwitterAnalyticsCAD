@@ -9,6 +9,7 @@ using System.Data.SqlTypes;
 using System.Data.SqlClient;
 using System.Configuration;
 using System.Collections.Generic;
+using TwitterAnalyticsCommon;
 
 namespace TwitterAnalyticsDBL.DataObjects
 {
@@ -60,10 +61,10 @@ namespace TwitterAnalyticsDBL.DataObjects
 		{
 			get
 			{
-				SqlConnection staticConnection = new SqlConnection();
-				staticConnection.ConnectionString = StaticConnectionString;
-				return staticConnection;
-			}
+                SqlConnection staticConnection = new SqlConnection();
+                staticConnection.ConnectionString = StaticConnectionString;
+                return staticConnection;
+            }
 		}
 
 		public virtual AzureSQLDBConn_TxConnectionProvider ConnectionProvider

@@ -11,19 +11,19 @@
 
 using System;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Configuration;
-using TwitterAnalyticsCommon;
-using System.Data.SqlClient;
 using System.Data;
-using System.Collections.Generic;
+using System.Reactive.Linq;
 
 namespace TwitterClient
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+
+        public static void Main(string[] args)
         {
+            //LogObserver logObserver = new LogObserver();
+
             try
             {
                 
@@ -39,16 +39,19 @@ namespace TwitterClient
                 config.ConnectionString = ConfigurationManager.AppSettings["EventHubConnectionString"];
                 config.EventHubName = ConfigurationManager.AppSettings["EventHubName"];
                 var myEventHubObserver = new EventHubObserver(config);
+                
 
                 var datum = Tweet.StreamStatuses(new TwitterConfig(oauthToken, oauthTokenSecret, oauthCustomerKey, oauthConsumerSecret,
-                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Where(tweet=>tweet.Topic!="Unknown").Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic, SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone, TweetText= tweet.Text,Retweeted=tweet.Retweeted, RetweetCount=tweet.RetweetCount});
+                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).Where(tweet=>tweet.Topic!="Unknown").Select(tweet => new Payload { CreatedAt = tweet.CreatedAt, Topic = tweet.Topic,
+                        SentimentScore = tweet.SentimentScore, PlaceTimeZone = tweet.TimeZone,
+                        TweetText = tweet.Text,Retweeted=tweet.Retweeted, RetweetCount=tweet.RetweetCount});
 
                 datum.ToObservable().Subscribe(myEventHubObserver);
             }
             catch (Exception ex)
             {
-
-
+                System.IO.File.AppendAllText(@"F:\www.txt", ex.Message.ToString()+" kkk "+ex.InnerException.ToString()+" sdfsd "+ex.StackTrace.ToString());
+               // ex.Data.ToObservable<string>().Subscribe(logObserver);
             }
 
         }

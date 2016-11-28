@@ -21,7 +21,7 @@ namespace TwitterAnalyticsWeb.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("AzureSQLDBConn", throwIfV1Schema: false)
         {
         }
 

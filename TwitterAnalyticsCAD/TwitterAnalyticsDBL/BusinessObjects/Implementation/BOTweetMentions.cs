@@ -257,12 +257,12 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<BOTweetMentions> TweetMentionsLatestTen()
+		public static IList<BOTweetMentions> TweetMentionsLatest()
         {
             try
             {
                 IList<BOTweetMentions> boTweetMentionsCollection = new List<BOTweetMentions>();
-                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatestTen();
+                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatest();
 
                 foreach (DAOTweetMentions daoTweetMentions in daoTweetMentionsCollection)
                     boTweetMentionsCollection.Add(new BOTweetMentions(daoTweetMentions));

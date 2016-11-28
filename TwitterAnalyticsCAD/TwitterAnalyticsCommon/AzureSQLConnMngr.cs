@@ -10,42 +10,29 @@ namespace TwitterAnalyticsCommon
 {
     public class AzureSQLConnMngr
     {
-        private AzureSQLConnMngr()
-        { }
-
+        private SqlConnection sqlConnection;
         private static AzureSQLConnMngr _instance;
-        private readonly SqlConnection sqlConn = new SqlConnection(ConfigurationManager.ConnectionStrings["AzureSQLDBConn"].ConnectionString);
 
-        private static AzureSQLConnMngr Instance
+        public static AzureSQLConnMngr Instance
         {
             get
             {
                 if (_instance == null)
                 {
                     _instance = new AzureSQLConnMngr();
+                    _instance.sqlConnection = new SqlConnection();
                 }
                 return _instance;
             }
+        }        
 
-        }
-
-        public static AzureSQLConnMngr GetInstance(bool isUserAuthenticated)
+        public SqlConnection AzureSqlConnection
         {
-
-            if (isUserAuthenticated)
+            get
             {
-                return Instance;
-            }
-            else
-            {
-                throw new UnauthorizedAccessException("User is not Autherized !!"); 
-            }
-            
-        }
 
-        public SqlConnection GetSqlConnection()
-        {
-            return this.sqlConn;
+                return this.sqlConnection;
+            }
         }
 
 

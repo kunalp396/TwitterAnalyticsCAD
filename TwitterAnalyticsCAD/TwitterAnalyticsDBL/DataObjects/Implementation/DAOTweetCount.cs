@@ -22,166 +22,15 @@ namespace TwitterAnalyticsDBL.DataObjects
 		protected Int32? _retweetCount;
 		protected DateTime? _createdAt;
 		protected Int32? _errorCode;
+        protected Int32 _totalCount;
 		#endregion
 
 		#region class methods
 		public DAOTweetCount()
 		{
 		}
-		///<Summary>
-		///Select one row by primary key(s)
-		///This method returns one row from the table TweetCount based on the primary key(s)
-		///</Summary>
-		///<returns>
-		///DAOTweetCount
-		///</returns>
-		///<parameters>
-		///Int64? id
-		///</parameters>
-		public static DAOTweetCount SelectOne(Int64? id)
-		{
-			SqlCommand	command = new SqlCommand();
-			command.CommandText = InlineProcs.ctprTweetCount_SelectOne;
-			command.CommandType = CommandType.Text;
-			SqlConnection staticConnection = StaticSqlConnection;
-			command.Connection = staticConnection;
-
-			DataTable dt = new DataTable("TweetCount");
-			SqlDataAdapter sqlAdapter = new SqlDataAdapter(command);
-			try
-			{
-				command.Parameters.Add(new SqlParameter("@Id", SqlDbType.BigInt, 8, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, (object)id?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
-
-				staticConnection.Open();
-				sqlAdapter.Fill(dt);
-
-				int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
-				if(errorCode > 1)
-					throw new Exception("procedure ctprTweetCount_SelectOne returned error code: " + errorCode );
-
-				DAOTweetCount retObj = null;
-				if(dt.Rows.Count > 0)
-				{
-					retObj = new DAOTweetCount();
-					retObj._id					 = Convert.IsDBNull(dt.Rows[0]["Id"]) ? (Int64?)null : (Int64?)dt.Rows[0]["Id"];
-					retObj._topic					 = Convert.IsDBNull(dt.Rows[0]["Topic"]) ? null : (string)dt.Rows[0]["Topic"];
-					retObj._sentimentScore					 = Convert.IsDBNull(dt.Rows[0]["SentimentScore"]) ? (Int32?)null : (Int32?)dt.Rows[0]["SentimentScore"];
-					retObj._placeTimeZone					 = Convert.IsDBNull(dt.Rows[0]["PlaceTimeZone"]) ? null : (string)dt.Rows[0]["PlaceTimeZone"];
-					retObj._tweetText					 = Convert.IsDBNull(dt.Rows[0]["TweetText"]) ? null : (string)dt.Rows[0]["TweetText"];
-					retObj._retweeted					 = Convert.IsDBNull(dt.Rows[0]["Retweeted"]) ? (Int32?)null : (Int32?)dt.Rows[0]["Retweeted"];
-					retObj._retweetCount					 = Convert.IsDBNull(dt.Rows[0]["RetweetCount"]) ? (Int32?)null : (Int32?)dt.Rows[0]["RetweetCount"];
-					retObj._createdAt					 = Convert.IsDBNull(dt.Rows[0]["CreatedAt"]) ? (DateTime?)null : (DateTime?)dt.Rows[0]["CreatedAt"];
-				}
-				return retObj;
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				staticConnection.Close();
-				command.Dispose();
-			}
-		}
-
-		///<Summary>
-		///Delete one row by primary key(s)
-		///this method allows the object to delete itself from the table TweetCount based on its primary key
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public virtual void Delete()
-		{
-			SqlCommand	command = new SqlCommand();
-			command.CommandText = InlineProcs.ctprTweetCount_DeleteOne;
-			command.CommandType = CommandType.Text;
-			command.Connection = _connectionProvider.Connection;
-			command.Transaction = _connectionProvider.CurrentTransaction;
-
-			try
-			{
-				command.Parameters.Add(new SqlParameter("@Id", SqlDbType.BigInt, 8, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, (object)_id?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, _errorCode));
-
-				command.ExecuteNonQuery();
-
-				_errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
-				if(_errorCode > 1)
-					throw new Exception("procedure ctprTweetCount_DeleteOne returned error code: " + _errorCode );
-
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				command.Dispose();
-			}
-		}
-
-		///<Summary>
-		///Insert a new row
-		///This method saves a new object to the table TweetCount
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public virtual void Insert()
-		{
-			SqlCommand	command = new SqlCommand();
-			command.CommandText = InlineProcs.ctprTweetCount_InsertOne;
-			command.CommandType = CommandType.Text;
-			command.Connection = _connectionProvider.Connection;
-			command.Transaction = _connectionProvider.CurrentTransaction;
-
-			try
-			{
-				command.Parameters.Add(new SqlParameter("@Id", SqlDbType.BigInt, 8, ParameterDirection.Output, false, 19, 0, "", DataRowVersion.Proposed, _id));
-				command.Parameters.Add(new SqlParameter("@Topic", SqlDbType.NVarChar, 4000, ParameterDirection.InputOutput, true, 0, 0, "", DataRowVersion.Proposed, (object)_topic?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@SentimentScore", SqlDbType.Int, 4, ParameterDirection.InputOutput, true, 10, 0, "", DataRowVersion.Proposed, (object)_sentimentScore?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@PlaceTimeZone", SqlDbType.NVarChar, 4000, ParameterDirection.InputOutput, true, 0, 0, "", DataRowVersion.Proposed, (object)_placeTimeZone?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@TweetText", SqlDbType.NVarChar, 4000, ParameterDirection.InputOutput, true, 0, 0, "", DataRowVersion.Proposed, (object)_tweetText?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@Retweeted", SqlDbType.Int, 4, ParameterDirection.InputOutput, true, 10, 0, "", DataRowVersion.Proposed, (object)_retweeted?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@RetweetCount", SqlDbType.Int, 4, ParameterDirection.InputOutput, true, 10, 0, "", DataRowVersion.Proposed, (object)_retweetCount?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@CreatedAt", SqlDbType.DateTime, 8, ParameterDirection.InputOutput, true, 0, 0, "", DataRowVersion.Proposed, (object)_createdAt?? (object)DBNull.Value));
-				command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, _errorCode));
-
-				command.ExecuteNonQuery();
-
-				_errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
-				if(_errorCode > 1)
-					throw new Exception("procedure ctprTweetCount_InsertOne returned error code: " + _errorCode );
-
-				_id					 = Convert.IsDBNull(command.Parameters["@Id"].Value) ? (Int64?)null : (Int64?)command.Parameters["@Id"].Value;
-				_topic					 = Convert.IsDBNull(command.Parameters["@Topic"].Value) ? null : (string)command.Parameters["@Topic"].Value;
-				_sentimentScore					 = Convert.IsDBNull(command.Parameters["@SentimentScore"].Value) ? (Int32?)null : (Int32?)command.Parameters["@SentimentScore"].Value;
-				_placeTimeZone					 = Convert.IsDBNull(command.Parameters["@PlaceTimeZone"].Value) ? null : (string)command.Parameters["@PlaceTimeZone"].Value;
-				_tweetText					 = Convert.IsDBNull(command.Parameters["@TweetText"].Value) ? null : (string)command.Parameters["@TweetText"].Value;
-				_retweeted					 = Convert.IsDBNull(command.Parameters["@Retweeted"].Value) ? (Int32?)null : (Int32?)command.Parameters["@Retweeted"].Value;
-				_retweetCount					 = Convert.IsDBNull(command.Parameters["@RetweetCount"].Value) ? (Int32?)null : (Int32?)command.Parameters["@RetweetCount"].Value;
-				_createdAt					 = Convert.IsDBNull(command.Parameters["@CreatedAt"].Value) ? (DateTime?)null : (DateTime?)command.Parameters["@CreatedAt"].Value;
-
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				command.Dispose();
-			}
-		}
-
+		
+		
 		///<Summary>
 		///Select all rows
 		///This method returns all data rows in the table TweetCount
@@ -243,15 +92,76 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
-		///<Summary>
+        ///<Summary>
+		///Select all rows
+		///This method returns all data rows in the table TweetCount
 		///</Summary>
 		///<returns>
-		///Int32
+		///IList-DAOTweetCount.
 		///</returns>
 		///<parameters>
 		///
 		///</parameters>
-		public static Int32 SelectAllCount()
+		public static IList<DAOTweetCount> SelectAllTweetGreaterThanId(long Id)
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetCount_SelectAllGreaterThanId;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
+
+            DataTable dt = new DataTable("TweetCount");
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(command);
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+                command.Parameters.Add(new SqlParameter("@Id", SqlDbType.BigInt, 8, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, Id));
+                staticConnection.Open();
+                sqlAdapter.Fill(dt);
+
+                int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (errorCode > 1)
+                    throw new Exception("procedure ctprTweetCount_SelectAll returned error code: " + errorCode);
+
+                List<DAOTweetCount> objList = new List<DAOTweetCount>();
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        DAOTweetCount retObj = new DAOTweetCount();
+                        retObj._id = Convert.IsDBNull(row["Id"]) ? (Int64?)null : (Int64?)row["Id"];
+                        retObj._topic = Convert.IsDBNull(row["Topic"]) ? null : (string)row["Topic"];
+                        retObj._sentimentScore = Convert.IsDBNull(row["SentimentScore"]) ? (Int32?)null : (Int32?)row["SentimentScore"];
+                        retObj._placeTimeZone = Convert.IsDBNull(row["PlaceTimeZone"]) ? null : (string)row["PlaceTimeZone"];
+                        retObj._tweetText = Convert.IsDBNull(row["TweetText"]) ? null : (string)row["TweetText"];
+                        retObj._retweeted = Convert.IsDBNull(row["Retweeted"]) ? (Int32?)null : (Int32?)row["Retweeted"];
+                        retObj._retweetCount = Convert.IsDBNull(row["RetweetCount"]) ? (Int32?)null : (Int32?)row["RetweetCount"];
+                        retObj._createdAt = Convert.IsDBNull(row["CreatedAt"]) ? (DateTime?)null : (DateTime?)row["CreatedAt"];
+                        objList.Add(retObj);
+                    }
+                }
+                return objList;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
+
+        ///<Summary>
+        ///</Summary>
+        ///<returns>
+        ///Int32
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static Int32 SelectAllCount()
 		{
 			SqlCommand	command = new SqlCommand();
 			command.CommandText = InlineProcs.ctprTweetCount_SelectAllCount;
@@ -350,15 +260,70 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
-		///<Summary>
+
+        ///<Summary>
 		///</Summary>
 		///<returns>
-		///Int32
+		///IList-DAOTweetCount.
 		///</returns>
 		///<parameters>
 		///DAOTweetCount daoTweetCount
 		///</parameters>
-		public static Int32 SelectAllBySearchFieldsCount(DAOTweetCount daoTweetCount)
+		public static IList<DAOTweetCount> TweetCountGetTopics()
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetCount_SelectAllTopics;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
+
+            DataTable dt = new DataTable("TweetCount");
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(command);
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+
+                staticConnection.Open();
+                sqlAdapter.Fill(dt);
+
+                int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (errorCode > 1)
+                    throw new Exception("procedure ctprTweetCount_SelectAllBySearchFields returned error code: " + errorCode);
+
+                List<DAOTweetCount> objList = new List<DAOTweetCount>();
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        DAOTweetCount retObj = new DAOTweetCount();
+                        
+                        retObj._topic = Convert.IsDBNull(row["Topic"]) ? null : (string)row["Topic"];
+                        retObj._totalCount = Convert.IsDBNull(row["Count"]) ? (Int32)0 : (Int32)row["Count"];
+                        objList.Add(retObj);
+                    }
+                }
+                return objList;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
+
+        ///<Summary>
+        ///</Summary>
+        ///<returns>
+        ///Int32
+        ///</returns>
+        ///<parameters>
+        ///DAOTweetCount daoTweetCount
+        ///</parameters>
+        public static Int32 SelectAllBySearchFieldsCount(DAOTweetCount daoTweetCount)
 		{
 			SqlCommand	command = new SqlCommand();
 			command.CommandText = InlineProcs.ctprTweetCount_SelectAllBySearchFieldsCount;
@@ -554,7 +519,19 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
-		public Int32? ErrorCode
+        public Int32 TotalCount
+        {
+            get
+            {
+                return _totalCount;
+            }
+            set
+            {
+                _totalCount = value;
+            }
+        }
+
+        public Int32? ErrorCode
 		{
 			get
 			{
@@ -571,77 +548,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class InlineProcs
 	{
-		internal static string ctprTweetCount_SelectOne = @"
-			-- Select one row based on the primary key(s)
-			-- selects all rows from the table
-			-- returning the error code if any
-			SELECT 
-			[Id]
-			,[Topic]
-			,[SentimentScore]
-			,[PlaceTimeZone]
-			,[TweetText]
-			,[Retweeted]
-			,[RetweetCount]
-			,[CreatedAt]
-			FROM [dbo].[TweetCount]
-			WHERE 
-			[Id] = @Id
-			-- returning the error code if any
-			SELECT @ErrorCode = @@ERROR
-			";
-
-		internal static string ctprTweetCount_DeleteOne = @"
-			-- Delete a row based on the primary key(s)
-			-- delete all matching from the table
-			-- returning the error code if any
-			DELETE [dbo].[TweetCount]
-			WHERE 
-			[Id] = @Id
-			-- returning the error code if any
-			SELECT @ErrorCode = @@ERROR
-			";
-
-		internal static string ctprTweetCount_InsertOne = @"
-			-- Insert a new row
-			-- inserts a new row into the table
-			-- returning the error code if any, and the identity field, if any
-			INSERT [dbo].[TweetCount]
-			(
-			[Topic]
-			,[SentimentScore]
-			,[PlaceTimeZone]
-			,[TweetText]
-			,[Retweeted]
-			,[RetweetCount]
-			,[CreatedAt]
-			)
-			VALUES
-			(
-			@Topic
-			,@SentimentScore
-			,@PlaceTimeZone
-			,@TweetText
-			,@Retweeted
-			,@RetweetCount
-			,@CreatedAt
-			)
-			SELECT 
-			@Id = [Id]
-			,@Topic = [Topic]
-			,@SentimentScore = [SentimentScore]
-			,@PlaceTimeZone = [PlaceTimeZone]
-			,@TweetText = [TweetText]
-			,@Retweeted = [Retweeted]
-			,@RetweetCount = [RetweetCount]
-			,@CreatedAt = [CreatedAt]
-			FROM [dbo].[TweetCount]
-			WHERE 
-			Id = SCOPE_IDENTITY()
-			-- returning the error code if any
-			SELECT @ErrorCode = @@ERROR
-			";
-
+		
 		internal static string ctprTweetCount_SelectAll = @"
 			-- Select All rows
 			-- selects all rows from the table
@@ -655,12 +562,31 @@ namespace TwitterAnalyticsDBL.DataObjects
 			,[Retweeted]
 			,[RetweetCount]
 			,[CreatedAt]
-			FROM [dbo].[TweetCount]
+			FROM [dbo].[TweetCount]          
 			-- returning the error code if any
 			SELECT @ErrorCode = @@ERROR
 			";
 
-		internal static string ctprTweetCount_SelectAllCount = @"
+        internal static string ctprTweetCount_SelectAllGreaterThanId = @"
+			-- Select All rows
+			-- selects all rows from the table
+			-- returning the error code if any
+			SELECT 
+			[Id]
+			,[Topic]
+			,[SentimentScore]
+			,[PlaceTimeZone]
+			,[TweetText]
+			,[Retweeted]
+			,[RetweetCount]
+			,[CreatedAt]
+			FROM [dbo].[TweetCount]
+            WHERE [Id]>@Id
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+        internal static string ctprTweetCount_SelectAllCount = @"
 			
 			-- selects count of all rows from the table
 			-- returning the error code if any
@@ -697,7 +623,20 @@ namespace TwitterAnalyticsDBL.DataObjects
 			SELECT @ErrorCode = @@ERROR
 			";
 
-		internal static string ctprTweetCount_SelectAllBySearchFieldsCount = @"
+
+        internal static string ctprTweetCount_SelectAllTopics = @"
+			
+			-- selects all rows from the table according to search criteria
+			-- returning the error code if any
+			SELECT Count(*) as Count,			
+			[Topic]
+			FROM [dbo].[TweetCount]
+			GROUP BY [TOPIC]
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+        internal static string ctprTweetCount_SelectAllBySearchFieldsCount = @"
 			-- Get count of rows returnable by this query
 			-- selects count of all rows from the table according to search criteria
 			-- returning the error code if any

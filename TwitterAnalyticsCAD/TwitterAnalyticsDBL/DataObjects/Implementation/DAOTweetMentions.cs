@@ -253,10 +253,10 @@ namespace TwitterAnalyticsDBL.DataObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<DAOTweetMentions> SelectLatestTen()
+		public static IList<DAOTweetMentions> SelectLatest()
         {
             SqlCommand command = new SqlCommand();
-            command.CommandText = InlineProcs.ctprTweetMentions_SelectLatestTen;
+            command.CommandText = InlineProcs.ctprTweetMentions_SelectLatest;
             command.CommandType = CommandType.Text;
             SqlConnection staticConnection = StaticSqlConnection;
             command.Connection = staticConnection;
@@ -723,7 +723,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 			SELECT @ErrorCode = @@ERROR
 			";
 
-        internal static string ctprTweetMentions_SelectLatestTen = @"
+        internal static string ctprTweetMentions_SelectLatest = @"
 			-- Select Latest 10
 			-- selects all rows from the table
 			-- returning the error code if any

@@ -9,6 +9,8 @@ namespace TwitterAnalyticsWeb
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
+            app.MapSignalR();
+            //app.UseHangfireServer();
         }
     }
 }
