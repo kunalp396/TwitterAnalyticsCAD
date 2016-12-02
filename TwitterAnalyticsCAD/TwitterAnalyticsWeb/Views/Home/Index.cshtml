@@ -2,15 +2,118 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>Twitter Real Time Data Analysis</h1>
-    <p class="lead"> CSS and JavaScript.</p>
-    
-</div>
 
-<div class="row">
-    <div class="col-md-4">
-             
-    </div>
-   
+<div class="jumbotron">
+    <h3>Twitter Real Time Sentiment Analysis</h3>
 </div>
+    <div class="row">
+        <div id="FinalGraph" class="col-md-7">
+            @{
+
+                Html.RenderAction("FinalGraph", "DashBoard");
+            }
+        </div>
+        <div id="LiveTweet" >
+            @{
+
+                Html.RenderAction("LiveTweets", "DashBoard");
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div id="TotalSentimentsPerSub" class="col-md-7">
+            @{
+                Html.RenderAction("OverAllSentimentsCount", "DashBoard");
+            }
+        </div>
+        <div id="NoOfTweetsPerSub" class="col-md-5">
+            @{
+                Html.RenderAction("OverAllTweets", "DashBoard");
+            }
+        </div>
+
+    </div>
+
+<script>
+    $(document).ready(function () {
+        $.ajaxSetup({ cache: false }); // This part addresses an IE bug.  without it, IE will only load the first number and will never refresh
+        setInterval(function () {
+            var scrollPosition = $(window).scrollTop();
+            $('#FinalGraph').load('@(Url.Action("FinalGraph", "DashBoard", null, Request.Url.Scheme))', function () {
+                $(window).scrollTop(scrollPosition);
+            });
+
+        }, 5000); 
+    });
+
+
+
+</script>
+
+@section scripts {
+    <!--Script references. -->
+    <!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
+    <!--Reference the SignalR library. -->
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <!--SignalR script to update the chat page and send messages.-->
+    <script>
+        $(function () {
+            // Reference the auto-generated proxy for the hub.
+            var chat = $.connection.liveTweetsPushNotification;
+            // Create a function that the hub can call back to display messages.
+            chat.client.sendTweetsToPage = function (time, message) {
+                // Add the message to the page.
+                // alert('got message')
+                $('#discussion').prepend('<li><strong>' + htmlEncode(time)
+                    + '</strong>: ' + htmlEncode(message) + '</li>');
+
+            };
+
+           // chat.client.sendTweetCountWithTopic = function (topic, count) {
+                // Add the message to the page.
+                //alert('got message')
+                //var timer = 1;
+                //if (timer == 1)
+               // {
+                    // alert($('#'+topic).length == 0);
+                    //alert($('#' + topic).length);
+                    //  timer = 2;
+               // }
+                //if ($('#' + topic).length == 0) {
+                //    $('#tweetsCountWithTopic').append('<div id="' + topic +
+                //        '"  style="height:50px; margin: 0px 5px 5px 0px;text-align:center;background-color:green;" > <div ><b>'
+                //        + htmlEncode(topic)
+                //        + '</b> </div><div> ' + htmlEncode(count) + '</div></div>');
+
+
+                //}
+
+                //var noOfColumns = (12 / $('#tweetsCountWithTopic').children().length) - 1;
+                //$('#' + topic).attr('class', 'col-md-' + noOfColumns);
+            //};
+
+            // Start the connection.
+            $.connection.hub.start().done(function () {
+
+                // Call the Send method on the hub.
+                $(document).ready(function () {
+                    //alert('sending data');
+                    chat.server.sendTweets('start');
+                    chat.server.analyzeData('winter');
+                });
+                // chat.server.sendTweets($('#displayname').val(), $('#message').val());
+                // Clear text box and reset focus for next comment.
+                //$('#message').val('').focus();
+
+            });
+        });
+        // This optional function html-encodes messages for display in the page.
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        }
+    </script>
+}

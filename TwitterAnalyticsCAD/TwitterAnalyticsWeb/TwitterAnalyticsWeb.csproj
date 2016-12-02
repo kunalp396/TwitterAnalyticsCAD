@@ -43,8 +43,16 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PublishDatabaseSettings>
+      <Objects>
+      </Objects>
+    </PublishDatabaseSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNet.Highcharts, Version=4.0.0.0, Culture=neutral, PublicKeyToken=88854f873df851bf, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNet.Highcharts.4.0\lib\DotNet.Highcharts.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.1.2.1\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -73,14 +81,36 @@
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.0.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.2-beta1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -141,9 +171,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -197,22 +224,27 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\DashBoardController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611022230426_InitialCreate.cs" />
+    <Compile Include="Migrations\201611022230426_InitialCreate.Designer.cs">
+      <DependentUpon>201611022230426_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\DashboardViewModels.cs" />
+    <Compile Include="SignalR\LiveTweetsPushNotification.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\TransactionCount.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Startup.cs" />
+    <Compile Include="SignalR\Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\aspnet-TwitterAnalyticsWeb-20161101074400.mdf" />
-    <Content Include="App_Data\aspnet-TwitterAnalyticsWeb-20161101074400_log.ldf">
-      <DependentUpon>aspnet-TwitterAnalyticsWeb-20161101074400.mdf</DependentUpon>
-    </Content>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -228,9 +260,42 @@
     <None Include="Properties\PublishProfiles\TwitterAnalyticsWeb - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\TwitterAnalyticsWeb.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\adapters\standalone-framework.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\adapters\standalone-framework.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\highcharts-all.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\highcharts-more.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\highcharts-more.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\highcharts.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\highcharts.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\canvas-tools.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\canvas-tools.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\data.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\data.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\drilldown.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\drilldown.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\exporting.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\exporting.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\funnel.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\funnel.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\heatmap.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\heatmap.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\no-data-to-display.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\no-data-to-display.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\solid-gauge.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\modules\solid-gauge.src.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\dark-blue.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\dark-green.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\dark-unica.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\gray.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\grid-light.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\grid.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\sand-signika.js" />
+    <Content Include="Scripts\Highcharts-4.0.1\js\themes\skies.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.1.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -274,8 +339,31 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Service References\Application Insights\ConnectedService.json" />
+    <Content Include="Views\DashBoard\Index.cshtml" />
+    <Content Include="Views\DashBoard\FinalGraph.cshtml" />
+    <Content Include="Views\DashBoard\LiveTweets.cshtml" />
+    <Content Include="Views\DashBoard\OverAllTweets.cshtml" />
+    <Content Include="Views\DashBoard\OverAllSentimentsCount.cshtml" />
+    <Content Include="Views\DashBoard\FilterCriteria.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
+      <Project>{22c54712-8933-4bdb-8c76-54910d6beaba}</Project>
+      <Name>TwitterAnalyticsCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TwitterAnalyticsDBL\TwitterAnalyticsDBL.csproj">
+      <Project>{670cc8d5-500f-4288-98dc-6591668d854f}</Project>
+      <Name>TwitterAnalyticsDBL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TwitterClient\TwitterClient.csproj">
+      <Project>{0393c9c2-00a1-426f-a837-cb0baee86056}</Project>
+      <Name>TwitterClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TwitterSentimentAnalytics\SentimentAnalytics.csproj">
+      <Project>{06549b3e-8961-40f4-a3f7-74d69bc3f9af}</Project>
+      <Name>SentimentAnalytics</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -287,6 +375,14 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201611022230426_InitialCreate.resx">
+      <DependentUpon>201611022230426_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

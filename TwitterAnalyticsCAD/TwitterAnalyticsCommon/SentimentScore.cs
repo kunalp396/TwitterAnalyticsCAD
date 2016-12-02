@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TwitterAnalyticsCAD
+namespace TwitterAnalyticsCommon
 {
-    class Program
+    public enum SentimentScore
     {
-        static void Main(string[] args)
-        {
-            //CAD project
-        }
+        Positive = 4,
+        Neutral = 2,
+        Negative = 0
     }
 }
