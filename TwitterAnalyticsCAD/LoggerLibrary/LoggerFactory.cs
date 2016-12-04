@@ -32,6 +32,8 @@ namespace TwitterAnalyticsCommon
         static readonly Dictionary<Type, Func<T>> _dict
              = new Dictionary<Type, Func<T>>();
 
+        public int Count { get { return _dict.Count; } }
+
         public static T Create(Type loggerType)
         {
             Func<T> constructor = null;
@@ -44,7 +46,10 @@ namespace TwitterAnalyticsCommon
 
         public static void Register(Type loggerType, Func<T> ctor)
         {
-            _dict.Add(loggerType, ctor);
+            if (!_dict.Keys.Contains(loggerType))
+            {
+                _dict.Add(loggerType, ctor);
+            }
         }
     }
 }
