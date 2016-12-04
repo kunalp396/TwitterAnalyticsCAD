@@ -21,11 +21,7 @@ using System.Configuration;
 
 namespace TwitterClient
 {
-<<<<<<< HEAD
-    class EventHubObserver : IObserver<Payload>
-=======
     public class EventHubObserver : IObserver<Payload>
->>>>>>> ff7e99ee4882a9597d76dc297032c1e9c3ef0f53
     {
         private EventHubConfig _config;
         private EventHubClient _eventHubClient;
@@ -53,17 +49,6 @@ namespace TwitterClient
                 var serialisedString = JsonConvert.SerializeObject(TwitterPayloadData);
                 EventData data = new EventData(Encoding.UTF8.GetBytes(serialisedString)) { PartitionKey = TwitterPayloadData.Topic };
                 _eventHubClient.Send(data);
-<<<<<<< HEAD
-               
-                
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Sending" + serialisedString + " at: " + TwitterPayloadData.CreatedAt.ToString() );
-                                
-            }
-            catch (Exception ex)
-            {
-                
-=======
 
                 System.IO.File.AppendAllText(@"F:\wwwwww1.txt", serialisedString);
 
@@ -75,7 +60,6 @@ namespace TwitterClient
             {
                 System.IO.File.AppendAllText(@"F:\wwwwww11.txt", ex.Message+ex.StackTrace);
 
->>>>>>> ff7e99ee4882a9597d76dc297032c1e9c3ef0f53
             }
 
         }

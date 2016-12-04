@@ -355,6 +355,10 @@
       <Project>{670cc8d5-500f-4288-98dc-6591668d854f}</Project>
       <Name>TwitterAnalyticsDBL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TwitterClient\TwitterClient.csproj">
+      <Project>{0393c9c2-00a1-426f-a837-cb0baee86056}</Project>
+      <Name>TwitterClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwitterSentimentAnalytics\SentimentAnalytics.csproj">
       <Project>{06549b3e-8961-40f4-a3f7-74d69bc3f9af}</Project>
       <Name>SentimentAnalytics</Name>

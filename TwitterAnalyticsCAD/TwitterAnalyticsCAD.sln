@@ -7,15 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsWeb", "Twit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsWeb.Tests", "TwitterAnalyticsWeb.Tests\TwitterAnalyticsWeb.Tests.csproj", "{A7383622-65BB-4D26-B1C9-76EE53DF97E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerLibrary", "LoggerLibrary\LoggerLibrary.csproj", "{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterClient", "TwitterClient\TwitterClient.csproj", "{0393C9C2-00A1-426F-A837-CB0BAEE86056}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsCommon", "TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj", "{22C54712-8933-4BDB-8C76-54910D6BEABA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterAnalyticsDBL", "TwitterAnalyticsDBL\TwitterAnalyticsDBL.csproj", "{670CC8D5-500F-4288-98DC-6591668D854F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentimentAnalytics", "TwitterSentimentAnalytics\SentimentAnalytics.csproj", "{06549B3E-8961-40F4-A3F7-74D69BC3F9AF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitterClient", "TwitterClient\TwitterClient.csproj", "{0393C9C2-00A1-426F-A837-CB0BAEE86056}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +29,10 @@ Global
 		{A7383622-65BB-4D26-B1C9-76EE53DF97E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7383622-65BB-4D26-B1C9-76EE53DF97E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7383622-65BB-4D26-B1C9-76EE53DF97E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Release|Any CPU.Build.0 = Release|Any CPU
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22C54712-8933-4BDB-8C76-54910D6BEABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,10 +45,6 @@ Global
 		{06549B3E-8961-40F4-A3F7-74D69BC3F9AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06549B3E-8961-40F4-A3F7-74D69BC3F9AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06549B3E-8961-40F4-A3F7-74D69BC3F9AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0393C9C2-00A1-426F-A837-CB0BAEE86056}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
