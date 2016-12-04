@@ -201,7 +201,7 @@ namespace TwitterClient
         public string TweetText;
         public bool Retweeted;
         public string RetweetCount;
-
+        public string UserId;
 
         public override string ToString()
         {

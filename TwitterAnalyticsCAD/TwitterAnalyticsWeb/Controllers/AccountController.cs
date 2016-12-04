@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using TwitterAnalyticsWeb.Models;
+using TwitterAnalyticsCommon;
 
 namespace TwitterAnalyticsWeb.Controllers
 {
@@ -17,15 +18,25 @@ namespace TwitterAnalyticsWeb.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
+        private IAuthenticationManager _authnManager;
+
+
 
         public AccountController()
         {
         }
+       
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
         {
             UserManager = userManager;
             SignInManager = signInManager;
+        }
+
+        public AccountController(UserManager<ApplicationUser> userManager)
+        {
+            this.userManager = userManager;
         }
 
         public ApplicationSignInManager SignInManager
@@ -68,7 +79,8 @@ namespace TwitterAnalyticsWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            
+            try
+            {
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -80,7 +92,7 @@ namespace TwitterAnalyticsWeb.Controllers
                 switch (result)
                 {
                     case SignInStatus.Success:
-                        return RedirectToAction("FilterCriteria","DashBoard");
+                        return RedirectToAction("FilterCriteria", "DashBoard");
                     case SignInStatus.LockedOut:
                         return View("Lockout");
                     case SignInStatus.RequiresVerification:
@@ -90,8 +102,13 @@ namespace TwitterAnalyticsWeb.Controllers
                         ModelState.AddModelError("", "Invalid login attempt.");
                         return View(model);
                 }
-            
-            
+
+            }
+            catch (Exception ex)
+            {
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                return View("Error");
+            }
         }
 
         //
@@ -395,7 +412,7 @@ namespace TwitterAnalyticsWeb.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         //
@@ -429,13 +446,17 @@ namespace TwitterAnalyticsWeb.Controllers
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
+        private UserManager<ApplicationUser> userManager;
 
-        private IAuthenticationManager AuthenticationManager
+        public IAuthenticationManager AuthenticationManager
         {
             get
             {
-                return HttpContext.GetOwinContext().Authentication;
+                if (_authnManager == null)
+                    _authnManager = HttpContext.GetOwinContext().Authentication;
+                return _authnManager;
             }
+            set { _authnManager = value; }
         }
 
         private void AddErrors(IdentityResult result)

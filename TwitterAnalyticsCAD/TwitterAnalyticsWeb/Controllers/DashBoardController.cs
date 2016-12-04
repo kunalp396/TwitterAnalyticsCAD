@@ -5,16 +5,19 @@ using DotNet.Highcharts;
 using DotNet.Highcharts.Options;
 using DotNet.Highcharts.Helpers;
 using TwitterAnalyticsDBL.BusinessObjects;
-using TwitterAnalyticsCommon;
 using System;
 using TwitterAnalyticsWeb.Models;
-using System.Diagnostics;
+using Microsoft.AspNet.Identity;
+using static TwitterClient.Sentiment;
+using TwitterAnalyticsCommon;
 
 namespace TwitterAnalyticsWeb.Controllers
 {
-
+    [Authorize]
     public class DashBoardController : Controller
     {
+        public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
+
         [HttpGet]
         public ViewResult FilterCriteria()
         {
@@ -34,7 +37,6 @@ namespace TwitterAnalyticsWeb.Controllers
                 new SelectListItem { Text = "1 Week", Value = "1 Week" }
 
             }.ToList();
-
 
             return View(filterCriteria);
         }
@@ -62,17 +64,22 @@ namespace TwitterAnalyticsWeb.Controllers
 
             }.ToList();
 
+
+
                     return View(filterCriteria);
                 }
 
             }
             catch (Exception ex)
             {
-
-                System.IO.File.AppendAllText(@"F:\wwwwww.txt", ex.Message + " sssssssssssss " + ex.StackTrace.ToString());
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
             }
 
-            return RedirectToAction("Index", "Home");
+            //Clearing existing data for current User for fresh analysis
+            BOTweetMentions.DeleteAll(User.Identity.GetUserId());
+            BOTweetCount.DeleteAll(User.Identity.GetUserId());
+
+            return RedirectToAction("Index", "Home", new { UserId = User.Identity.GetUserId() });
         }
 
 
@@ -137,7 +144,7 @@ namespace TwitterAnalyticsWeb.Controllers
             }
             catch (Exception ex)
             {
-                System.IO.File.WriteAllText(@"F:\temp1.txt", ex.StackTrace);
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
                 return null;
 
             }
@@ -178,7 +185,7 @@ namespace TwitterAnalyticsWeb.Controllers
             }
             catch (Exception ex)
             {
-                System.IO.File.WriteAllText(@"F:\temp2.txt", ex.StackTrace);
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
                 return null;
 
             }
@@ -195,11 +202,19 @@ namespace TwitterAnalyticsWeb.Controllers
                 .SetTitle(new Title { Text = "Tweets per 5 sec" })
                 .SetSubtitle(new Subtitle { Text = "Overall Status" })
                 .SetXAxis(new XAxis { Categories = xDataMonths, Labels = new XAxisLabels { Rotation = -90 } })
-                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Count" } })
+                .SetYAxis(new[] { new YAxis { Title = new YAxisTitle { Text = "Count" } }
+                //,new YAxis { Min=0,Max=4,TickInterval=2,Labels=new YAxisLabels { Formatter="function() { if(this.value==0){return 'Negative';} if(this.value==2){return 'Positive';}}"},Opposite=true } 
+                } 
+                    )
                 .SetTooltip(new Tooltip
                 {
                     Enabled = true,
-                    Formatter = @"function(){return '<b> '+this.series.name+' </b></br>'+this.x+' : '+this.y; }"
+                    Formatter = @"function(){
+
+    return '<b> '+this.series.name+' </b></br>'+this.x+' : '+this.y; 
+  
+
+}"
                 })
                             .SetPlotOptions(new PlotOptions
                             {
@@ -286,7 +301,7 @@ namespace TwitterAnalyticsWeb.Controllers
 
                 .InitChart(new Chart { DefaultSeriesType = DotNet.Highcharts.Enums.ChartTypes.Column })
                 .SetTitle(new Title { Text = "" })
-                .SetSubtitle(new Subtitle { Text = "Total no. of Sentiments" })
+                .SetSubtitle(new Subtitle { Text = "Count of Tweets by Sentiments" })
                 .SetXAxis(new XAxis { Categories = xAxisPlot })
                 .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Tweets Count" } })
                 .SetTooltip(new Tooltip

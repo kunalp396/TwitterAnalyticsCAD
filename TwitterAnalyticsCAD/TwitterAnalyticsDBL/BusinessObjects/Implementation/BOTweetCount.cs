@@ -5,6 +5,7 @@
 **************************************************************/
 using System;
 using System.Collections.Generic;
+using TwitterAnalyticsCommon;
 using TwitterAnalyticsDBL.DataObjects;
 
 namespace TwitterAnalyticsDBL.BusinessObjects
@@ -26,6 +27,8 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		protected DateTime? _createdAt;
 		protected bool _isDirty = false;
         protected int _totalCount;
+
+        private static ILogger logger = LoggerFactory<ILogger>.Create(typeof(DALLogger));
 
         /*collection member objects*******************/
         /*********************************************/
@@ -71,9 +74,10 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_createdAt = daoTweetCount.CreatedAt;
                 _totalCount = daoTweetCount.TotalCount;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw;
 			}
 		}
 
@@ -117,24 +121,52 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_createdAt = daoTweetCount.CreatedAt;
 				_isDirty = false;
 			}
-			catch
+			catch(Exception ex)
 			{
 				RollbackTransaction("updateBOTweetCount");
-				throw;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw;
 			}
 		}
-		
-		///<Summary>
-		///TweetCountCollection
-		///This method returns the collection of BOTweetCount objects
-		///</Summary>
-		///<returns>
-		///List[BOTweetCount]
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public static IList<BOTweetCount> TweetCountCollection()
+
+
+        ///<Summary>
+        ///Delete
+        ///This method deletes one TweetCount record from the store
+        ///</Summary>
+        ///<returns>
+        ///void
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static void DeleteAll(string UserId)
+        {
+            DAOTweetCount daoTweetCount = new DAOTweetCount();
+            try
+            {
+                daoTweetCount.DeleteAll(UserId);
+
+            }
+            catch (Exception ex)
+            {
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
+            }
+        }
+
+        ///<Summary>
+        ///TweetCountCollection
+        ///This method returns the collection of BOTweetCount objects
+        ///</Summary>
+        ///<returns>
+        ///List[BOTweetCount]
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static IList<BOTweetCount> TweetCountCollection()
 		{
 			try
 			{
@@ -148,7 +180,8 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-				throw ex;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw ex;
 			}
 		}
 
@@ -176,6 +209,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
             }
             catch (Exception ex)
             {
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
                 throw ex;
             }
         }
@@ -198,9 +232,10 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				Int32 objCount = DAOTweetCount.SelectAllCount();
 				return objCount;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw;
 			}
 		}
 		
@@ -236,9 +271,10 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			
 				return boTweetCountCollection;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw;
 			}
 		}
 
@@ -265,8 +301,9 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 
                 return boTweetCountCollection;
             }
-            catch
+            catch(Exception ex)
             {
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
                 throw;
             }
         }
@@ -298,9 +335,10 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				Int32 objCount = DAOTweetCount.SelectAllBySearchFieldsCount(daoTweetCount);
 				return objCount;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                throw;
 			}
 		}
 		

@@ -13,7 +13,7 @@
                 Html.RenderAction("FinalGraph", "DashBoard");
             }
         </div>
-        <div id="LiveTweet" >
+        <div id="LiveTweets" >
             @{
 
                 Html.RenderAction("LiveTweets", "DashBoard");
@@ -43,7 +43,13 @@
                 $(window).scrollTop(scrollPosition);
             });
 
-        }, 5000); 
+
+            $('#TotalSentimentsPerSub').load('@(Url.Action("OverAllSentimentsCount", "DashBoard", null, Request.Url.Scheme))');
+
+            $('#NoOfTweetsPerSub').load('@(Url.Action("OverAllTweets", "DashBoard", null, Request.Url.Scheme))');
+
+
+        }, 5000);
     });
 
 
@@ -72,29 +78,17 @@
 
             };
 
-           // chat.client.sendTweetCountWithTopic = function (topic, count) {
-                // Add the message to the page.
-                //alert('got message')
-                //var timer = 1;
-                //if (timer == 1)
-               // {
-                    // alert($('#'+topic).length == 0);
-                    //alert($('#' + topic).length);
-                    //  timer = 2;
-               // }
-                //if ($('#' + topic).length == 0) {
-                //    $('#tweetsCountWithTopic').append('<div id="' + topic +
-                //        '"  style="height:50px; margin: 0px 5px 5px 0px;text-align:center;background-color:green;" > <div ><b>'
-                //        + htmlEncode(topic)
-                //        + '</b> </div><div> ' + htmlEncode(count) + '</div></div>');
-
-
-                //}
-
-                //var noOfColumns = (12 / $('#tweetsCountWithTopic').children().length) - 1;
-                //$('#' + topic).attr('class', 'col-md-' + noOfColumns);
-            //};
-
+          
+            function getUrlVars() {
+                var vars = [], hash;
+                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                for (var i = 0; i < hashes.length; i++) {
+                    hash = hashes[i].split('=');
+                    vars.push(hash[0]);
+                    vars[hash[0]] = hash[1];
+                }
+                return vars;
+            }
             // Start the connection.
             $.connection.hub.start().done(function () {
 
@@ -102,7 +96,8 @@
                 $(document).ready(function () {
                     //alert('sending data');
                     chat.server.sendTweets('start');
-                    chat.server.analyzeData('winter');
+                    chat.server.analyzeData(getUrlVars()['UserId']);
+                    
                 });
                 // chat.server.sendTweets($('#displayname').val(), $('#message').val());
                 // Clear text box and reset focus for next comment.
@@ -110,6 +105,11 @@
 
             });
         });
+
+        window.onbeforeunload = function (e) {
+           // alert('Closing Hub');
+            $.connection.hub.stop();
+        };
         // This optional function html-encodes messages for display in the page.
         function htmlEncode(value) {
             var encodedValue = $('<div />').text(value).html();

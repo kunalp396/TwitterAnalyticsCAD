@@ -8,6 +8,7 @@ using TwitterClient;
 using System.Configuration;
 using System.Linq;
 using System.Reactive.Linq;
+using TwitterAnalyticsCommon;
 
 namespace TwitterAnalyticsWeb
 {
@@ -19,6 +20,7 @@ namespace TwitterAnalyticsWeb
         public static string keywords;
         public static DateTime tweetEndTime;
         public static string tweetTimeZone;
+        public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
 
 
         public void SendTweets(string message)
@@ -31,39 +33,43 @@ namespace TwitterAnalyticsWeb
             }
         }
 
-        public void AnalyzeData(string message)
+        public void AnalyzeData(string UserId)
         {
+            if (!string.IsNullOrWhiteSpace(UserId))
+            {
+                
+                //Configure Twitter OAuth
+                var oauthToken = ConfigurationManager.AppSettings["oauth_token"];
+                var oauthTokenSecret = ConfigurationManager.AppSettings["oauth_token_secret"];
+                var oauthCustomerKey = ConfigurationManager.AppSettings["oauth_consumer_key"];
+                var oauthConsumerSecret = ConfigurationManager.AppSettings["oauth_consumer_secret"];
 
-            //Configure Twitter OAuth
-            var oauthToken = ConfigurationManager.AppSettings["oauth_token"];
-            var oauthTokenSecret = ConfigurationManager.AppSettings["oauth_token_secret"];
-            var oauthCustomerKey = ConfigurationManager.AppSettings["oauth_consumer_key"];
-            var oauthConsumerSecret = ConfigurationManager.AppSettings["oauth_consumer_secret"];
-
-            //Configure EventHub
-            var config = new EventHubConfig();
-            config.ConnectionString = ConfigurationManager.AppSettings["EventHubConnectionString"];
-            config.EventHubName = ConfigurationManager.AppSettings["EventHubName"];
-            var myEventHubObserver = new EventHubObserver(config);
+                //Configure EventHub
+                var config = new EventHubConfig();
+                config.ConnectionString = ConfigurationManager.AppSettings["EventHubConnectionString"];
+                config.EventHubName = ConfigurationManager.AppSettings["EventHubName"];
+                var myEventHubObserver = new EventHubObserver(config);
 
 
-            var datum = Tweet.StreamStatuses(new TwitterConfig(oauthToken, oauthTokenSecret, oauthCustomerKey, oauthConsumerSecret,
-                keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).
-                Where(tweet => tweet.Topic != "Unknown" 
-                && ( tweetTimeZone.ToUpper().Contains(tweet.TimeZone.ToUpper()) || string.Compare(tweetTimeZone,"All")==0)           
-                && DateTime.Compare(DateTime.Now,tweetEndTime)<=0 ).
-                Select(tweet => new Payload
-                {
-                    CreatedAt = tweet.CreatedAt,
-                    Topic = tweet.Topic,
-                    SentimentScore = tweet.SentimentScore,
-                    PlaceTimeZone = tweet.TimeZone,
-                    TweetText = tweet.Text,
-                    Retweeted = tweet.Retweeted,
-                    RetweetCount = tweet.RetweetCount
-                });
+                var datum = Tweet.StreamStatuses(new TwitterConfig(oauthToken, oauthTokenSecret, oauthCustomerKey, oauthConsumerSecret,
+                    keywords)).Select(tweet => Sentiment.ComputeScore(tweet, keywords)).
+                    Where(tweet => tweet.Topic != "Unknown"
+                    && (tweetTimeZone.ToUpper().Contains(tweet.TimeZone.ToUpper()) || string.Compare(tweetTimeZone, "All") == 0)
+                    && DateTime.Compare(DateTime.Now, tweetEndTime) <= 0).
+                    Select(tweet => new Payload
+                    {
+                        CreatedAt = tweet.CreatedAt,
+                        UserId = UserId,
+                        Topic = tweet.Topic,
+                        SentimentScore = tweet.SentimentScore,
+                        PlaceTimeZone = tweet.TimeZone,
+                        TweetText = tweet.Text,
+                        Retweeted = tweet.Retweeted,
+                        RetweetCount = tweet.RetweetCount
+                    });
 
-            datum.ToObservable().Subscribe(myEventHubObserver);
+                datum.ToObservable().Subscribe(myEventHubObserver);
+            }
         }
 
         public void SetAnalyzeParameters(string topic, string duration, string timeZone)
@@ -100,7 +106,8 @@ namespace TwitterAnalyticsWeb
                 return DateTime.Now.AddMinutes(15);
             }
 
-        }
+        }       
+
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -112,7 +119,7 @@ namespace TwitterAnalyticsWeb
                 foreach (BOTweetCount tweet in latestTweets)
                 {
                     //SignalR Code to send Tweet to All Client
-                    Clients.All.sendTweetsToPage(((DateTime)tweet.CreatedAt).TimeOfDay.ToString(), tweet.TweetText);
+                    Clients.All.sendTweetsToPage(((DateTime)tweet.CreatedAt).TimeOfDay.ToString("hh:mm:ss.ff"), tweet.TweetText);
                                         
                 }
 
@@ -124,7 +131,7 @@ namespace TwitterAnalyticsWeb
             }
             catch (Exception ex)
             {
-                System.IO.File.WriteAllText(@"F:\temp.txt", ex.StackTrace);
+                logger.Log(ex.StackTrace,LOGLEVELS.ERROR);
             }
             
             }

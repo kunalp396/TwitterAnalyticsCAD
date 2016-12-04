@@ -347,6 +347,10 @@
     <Content Include="Views\DashBoard\FilterCriteria.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LoggerLibrary\LoggerLibrary.csproj">
+      <Project>{b4b7f6d2-ad57-4faf-afb7-97e9abfe362b}</Project>
+      <Name>LoggerLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
       <Project>{22c54712-8933-4bdb-8c76-54910d6beaba}</Project>
       <Name>TwitterAnalyticsCommon</Name>

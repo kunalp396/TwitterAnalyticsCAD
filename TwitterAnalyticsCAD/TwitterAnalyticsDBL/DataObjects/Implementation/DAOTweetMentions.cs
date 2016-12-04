@@ -126,9 +126,9 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
-		///<Summary>
-		///Insert a new row
-		///This method saves a new object to the table TweetMentions
+        ///<Summary>
+		///Delete one row by primary key(s)
+		///this method allows the object to delete itself from the table TweetMentions based on its primary key
 		///</Summary>
 		///<returns>
 		///void
@@ -136,7 +136,50 @@ namespace TwitterAnalyticsDBL.DataObjects
 		///<parameters>
 		///
 		///</parameters>
-		public virtual void Insert()
+		public virtual void DeleteAll(string UserId)
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetMentions_DeleteAll;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
+
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, (object)UserId ?? (object)DBNull.Value));
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, _errorCode));
+
+                staticConnection.Open();
+
+                command.ExecuteNonQuery();
+
+                _errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (_errorCode > 1)
+                    throw new Exception("procedure ctprTweetMentions_DeleteOne returned error code: " + _errorCode);
+
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
+
+        ///<Summary>
+        ///Insert a new row
+        ///This method saves a new object to the table TweetMentions
+        ///</Summary>
+        ///<returns>
+        ///void
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public virtual void Insert()
 		{
 			SqlCommand	command = new SqlCommand();
 			command.CommandText = InlineProcs.ctprTweetMentions_InsertOne;
@@ -665,7 +708,18 @@ namespace TwitterAnalyticsDBL.DataObjects
 			SELECT @ErrorCode = @@ERROR
 			";
 
-		internal static string ctprTweetMentions_InsertOne = @"
+        internal static string ctprTweetMentions_DeleteAll = @"
+			-- Delete a row based on the primary key(s)
+			-- delete all matching from the table
+			-- returning the error code if any
+			DELETE [dbo].[TweetMentions]
+			WHERE 
+			[UserId] = @UserId
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+        internal static string ctprTweetMentions_InsertOne = @"
 			-- Insert a new row
 			-- inserts a new row into the table
 			-- returning the error code if any, and the identity field, if any

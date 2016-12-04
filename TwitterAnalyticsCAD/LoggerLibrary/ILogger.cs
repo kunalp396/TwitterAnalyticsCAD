@@ -8,9 +8,9 @@ namespace TwitterAnalyticsCommon
 {
     public interface ILogger
     {
-        void Log(string message);
+         void Log(string message);
 
-        void Log(string message, LOGLEVELS loglevel);
+         void Log(string message, LOGLEVELS loglevel);
     }
 
     public enum LOGLEVELS

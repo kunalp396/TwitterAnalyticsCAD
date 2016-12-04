@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{670CC8D5-500F-4288-98DC-6591668D854F}</ProjectGuid>
+    <ProjectGuid>{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TwitterAnalyticsDBL</RootNamespace>
-    <AssemblyName>TwitterAnalyticsDBL</AssemblyName>
+    <RootNamespace>LoggerLibrary</RootNamespace>
+    <AssemblyName>LoggerLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,7 +31,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,29 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessObjects\Implementation\AzureSQLDBConn_BaseBusiness.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTimeZone.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetCount.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetMentions.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_BaseData.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_TxConnectionProvider.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTimeZone.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetCount.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetMentions.cs" />
+    <Compile Include="DALLogger.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="LoggerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LoggerLibrary\LoggerLibrary.csproj">
-      <Project>{b4b7f6d2-ad57-4faf-afb7-97e9abfe362b}</Project>
-      <Name>LoggerLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
-      <Project>{22C54712-8933-4BDB-8C76-54910D6BEABA}</Project>
-      <Name>TwitterAnalyticsCommon</Name>
-    </ProjectReference>
+    <Compile Include="WebLogger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

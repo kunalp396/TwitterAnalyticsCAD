@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using TwitterAnalyticsCommon;
 
 namespace TwitterAnalyticsWeb
 {
@@ -15,7 +16,11 @@ namespace TwitterAnalyticsWeb
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            
+           LoggerFactory<ILogger>.Register(typeof(WebLogger),()=>new WebLogger());
+           LoggerFactory<ILogger>.Register(typeof(DALLogger), () => new DALLogger());
+
+
+
         }
     }
 }
