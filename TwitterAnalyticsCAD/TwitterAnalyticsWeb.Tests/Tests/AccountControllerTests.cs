@@ -45,8 +45,7 @@ namespace TwitterAnalyticsWeb.Tests.Controllers
         
         [TestMethod]
         public void Login_View_IsAvailable()
-        {
-            
+        {            
 
             // Arrange
             var _controller = CreateAccountControllerAs("Rohit4@gmail.com");

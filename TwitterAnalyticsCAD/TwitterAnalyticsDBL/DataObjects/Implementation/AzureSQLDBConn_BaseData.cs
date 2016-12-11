@@ -11,6 +11,7 @@ using System.Configuration;
 using System.Collections.Generic;
 using TwitterAnalyticsCommon;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class AzureSQLDBConn_BaseData : IDisposable

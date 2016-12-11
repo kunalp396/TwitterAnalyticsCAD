@@ -10,6 +10,8 @@ using TwitterAnalyticsWeb.Models;
 using Microsoft.AspNet.Identity;
 using static TwitterClient.Sentiment;
 using TwitterAnalyticsCommon;
+using System.Globalization;
+using Newtonsoft.Json;
 
 namespace TwitterAnalyticsWeb.Controllers
 {
@@ -17,6 +19,14 @@ namespace TwitterAnalyticsWeb.Controllers
     public class DashBoardController : Controller
     {
         public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
+        JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+        List<DataPoint> dummylist = new List<DataPoint>();
+
+        public DashBoardController()
+        {
+            dummylist.Add(new DataPoint(0, 0));
+
+        }
 
         [HttpGet]
         public ViewResult FilterCriteria()
@@ -46,6 +56,7 @@ namespace TwitterAnalyticsWeb.Controllers
         {
             try
             {
+                throw new Exception();
                 if (string.IsNullOrWhiteSpace(filterCriteria.Topics))
                 {
                     var timeZoneList = BOTimeZone.TimeZoneCollection().OrderBy(tz => tz.TimeZoneDisplayName).
@@ -73,37 +84,65 @@ namespace TwitterAnalyticsWeb.Controllers
             catch (Exception ex)
             {
                 logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //error = ex.StackTrace;
             }
 
             //Clearing existing data for current User for fresh analysis
             BOTweetMentions.DeleteAll(User.Identity.GetUserId());
             BOTweetCount.DeleteAll(User.Identity.GetUserId());
 
-            return RedirectToAction("Index", "Home", new { UserId = User.Identity.GetUserId() });
+            return RedirectToAction("Index", "Home", new { UserId = Url.Encode(User.Identity.GetUserId()) });
         }
 
 
         public ActionResult FinalGraph()
         {
-            IList<BOTweetMentions> listLatestTenTweetMentions = BOTweetMentions.TweetMentionsLatest();
-
-            List<string> timecollection = new List<string>();
-            List<object> tweetCountCollection = new List<object>();
-            List<object> tweetAvgSentimentCollection = new List<object>();
-
-            foreach (BOTweetMentions tweetMention in listLatestTenTweetMentions)
+            try
             {
-                timecollection.Add(tweetMention.Time.TimeOfDay.ToString());
-                tweetCountCollection.Add(tweetMention.Count.Value);
-                tweetAvgSentimentCollection.Add(tweetMention.Avg.Value);
+                IList<BOTweetMentions> listLatestTenTweetMentions = BOTweetMentions.TweetMentionsLatest(User.Identity.GetUserId());
+
+                //List<string> timecollection = new List<string>();
+                //List<object> tweetCountCollection = new List<object>();
+                //List<object> tweetAvgSentimentCollection = new List<object>();
+
+                List<DataPoint> tweetCountSeries = new List<DataPoint>();
+                List<DataPoint> avgSentimentSeries = new List<DataPoint>();
+
+                foreach (BOTweetMentions tweetMention in listLatestTenTweetMentions)
+                {
+                    //timecollection.Add(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture));
+                    //tweetCountCollection.Add(tweetMention.Count.Value);
+                    //tweetAvgSentimentCollection.Add(tweetMention.Avg.Value);
+                    double floattime = float.Parse(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture));
+                    floattime = Math.Round(floattime, 2);
+                    floattime = Math.Ceiling(floattime * 20) / 20;
+
+                    //double xvalue = Math.Round((float.Parse(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture))/5.0)*5,2);
+                    double xvalue = floattime;
+                    double yvalue_tweetCount = tweetMention.Count.Value;
+                    double yvalue_avgSentiment = tweetMention.Avg.Value;
+
+                    tweetCountSeries.Add(new DataPoint(xvalue,yvalue_tweetCount));
+                    avgSentimentSeries.Add(new DataPoint(xvalue, yvalue_avgSentiment));
+                }
+
+                //var xDataMonths = timecollection.ToArray();
+                //var yDataCounts = tweetCountCollection.ToArray();
+                //var yDataAvgSentimentCounts = tweetAvgSentimentCollection.ToArray();
+                // Highcharts mychart = lineChartSentiment("FinalDashBoard", xDataMonths, yDataCounts, yDataAvgSentimentCounts);
+                ViewBag.TweetCountSeries = JsonConvert.SerializeObject(tweetCountSeries, _jsonSetting);
+                ViewBag.AvgSentimentSeries = JsonConvert.SerializeObject(avgSentimentSeries, _jsonSetting); 
+
+                return PartialView();
             }
+            catch (Exception ex)
+            {
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                ViewBag.TweetCountSeries = JsonConvert.SerializeObject(dummylist, _jsonSetting);
+                ViewBag.AvgSentimentSeries = JsonConvert.SerializeObject(dummylist, _jsonSetting);
 
-            var xDataMonths = timecollection.ToArray();
-            var yDataCounts = tweetCountCollection.ToArray();
-            var yDataAvgSentimentCounts = tweetAvgSentimentCollection.ToArray();
-            Highcharts mychart = lineChartSentiment("FinalDashBoard", xDataMonths, yDataCounts, yDataAvgSentimentCounts);
-
-            return PartialView(mychart);
+                return PartialView();
+            }
         }
 
         public ActionResult LiveTweets()
@@ -115,38 +154,60 @@ namespace TwitterAnalyticsWeb.Controllers
         {
             try
             {
-                IList<BOTweetCount> listLatestTenTweetCount = BOTweetCount.TweetCountCollection();
+                IList<BOTweetMentions> tweetMentionTopicList= BOTweetMentions.TweetMentionsDistinctTopics(User.Identity.GetUserId());
+                List<string> distinctTopicList = tweetMentionTopicList.Select(data => data.Topic).ToList();
 
-                Dictionary<string, int> allTweetsCountbyTopic = new Dictionary<string, int>();
-                Dictionary<string, Dictionary<string, int>> allSentimentsbyTopic = new Dictionary<string, Dictionary<string, int>>();
+                List<DataPoint> tweetSpeeder = new List<DataPoint>();
 
-                foreach (BOTweetCount tweetCount in listLatestTenTweetCount)
+                foreach (var topic in distinctTopicList)
                 {
-                    if (!allTweetsCountbyTopic.ContainsKey(tweetCount.Topic.ToUpper()))
-                    {
-                        allTweetsCountbyTopic.Add(tweetCount.Topic.ToUpper(), 0);
-                    }
-                    else
-                    {
-                        allTweetsCountbyTopic[tweetCount.Topic.ToUpper()] += 1;
-                    }
+                    int speed = 0;
+                    speed=BOTweetCount.TweetSpeed(User.Identity.GetUserId(),topic);
+
+                    tweetSpeeder.Add(new DataPoint(speed,topic));
+                }
 
 
+                //IList<BOTweetCount> listLatestTenTweetCount = BOTweetCount.TweetCountCollection(User.Identity.GetUserId());
 
-                };
+                //Dictionary<string, int> allTweetsCountbyTopic = new Dictionary<string, int>();
+                //Dictionary<string, Dictionary<string, int>> allSentimentsbyTopic = new Dictionary<string, Dictionary<string, int>>();
 
-                var xDataMonths = allTweetsCountbyTopic.Keys.ToArray();
-                var yDataCounts = allTweetsCountbyTopic.Values.Select(count => (object)count).ToArray();
+                //foreach (BOTweetCount tweetCount in listLatestTenTweetCount)
+                //{
+                //    if (!allTweetsCountbyTopic.ContainsKey(tweetCount.Topic.ToUpper()))
+                //    {
+                //        allTweetsCountbyTopic.Add(tweetCount.Topic.ToUpper(), 0);
+                //    }
+                //    else
+                //    {
+                //        allTweetsCountbyTopic[tweetCount.Topic.ToUpper()] += 1;
+                //    }
 
-                Highcharts overAllSentimentChart = barChartTweetsByTopic("OverAllTweets", xDataMonths, yDataCounts);
+                //};
 
-                return PartialView(overAllSentimentChart);
+                ////var xDataMonths = allTweetsCountbyTopic.Keys.ToArray();
+                ////var yDataCounts = allTweetsCountbyTopic.Values.Select(count => (object)count).ToArray();
+
+                //List<DataPoint> barcharTopicsCount = new List<DataPoint>();
+
+                ////Highcharts overAllSentimentChart = barChartTweetsByTopic("OverAllTweets", xDataMonths, yDataCounts);
+                //foreach(string key in allTweetsCountbyTopic.Keys)
+                //{
+                //    barcharTopicsCount.Add(new DataPoint(allTweetsCountbyTopic[key], key));
+                //}
+
+                ViewBag.TopicSpeeder = JsonConvert.SerializeObject(tweetSpeeder, _jsonSetting);
+
+                return PartialView();
             }
             catch (Exception ex)
             {
+                //error = ex.StackTrace;
                 logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
-                return null;
+                ViewBag.TopicSpeeder = JsonConvert.SerializeObject(dummylist, _jsonSetting);
 
+                return PartialView();
             }
 
 
@@ -155,12 +216,14 @@ namespace TwitterAnalyticsWeb.Controllers
 
         public ActionResult OverAllSentimentsCount()
         {
+            List<DataPoint> dummylist = new List<DataPoint>();
+            dummylist.Add(new DataPoint(0, 0));
             try
             {
-                IList<BOTweetCount> listLatestTenTweetCount = BOTweetCount.TweetCountCollection();
+                IList<BOTweetCount> listLatestTweetCounts = BOTweetCount.TweetCountCollection(User.Identity.GetUserId());
                 Dictionary<string, Dictionary<string, int>> allSentimentsbyTopic = new Dictionary<string, Dictionary<string, int>>();
 
-                foreach (BOTweetCount tweetCount in listLatestTenTweetCount)
+                foreach (BOTweetCount tweetCount in listLatestTweetCounts)
                 {
                     if (!allSentimentsbyTopic.ContainsKey(tweetCount.Topic.ToUpper()))
                     {
@@ -179,156 +242,62 @@ namespace TwitterAnalyticsWeb.Controllers
 
                 var topics = allSentimentsbyTopic.Keys.ToArray();
 
-                Highcharts overAllSentimentChart = barChartSentimentsByCount("OverAllSentimentsCount", topics, allSentimentsbyTopic);
+                List<Series> yAxisData = new List<Series>();
 
-                return PartialView(overAllSentimentChart);
+                List<DataPoint> negativeSentimentbyTopic = new List<DataPoint>();
+                List<DataPoint> positiveSentimentbyTopic = new List<DataPoint>();
+                List<DataPoint> neutralSentimentbyTopic = new List<DataPoint>();
+
+
+                string[] sentimentScoreCounter = new string[] { "NEGATIVE", "POSITIVE", "NEUTRAL" };
+                foreach (string item in sentimentScoreCounter)
+                {
+                    //List<object> data = new List<object>();
+                    foreach (string key in allSentimentsbyTopic.Keys)
+                    {
+                        //data.Add(allSentimentsbyTopic[key][item]);
+                        if (string.Compare(item, "NEGATIVE", true) == 0)
+                        {
+                            negativeSentimentbyTopic.Add(new DataPoint(allSentimentsbyTopic[key][item], key));
+                        }
+                        else if (string.Compare(item, "POSITIVE", true) == 0)
+                        {
+                            positiveSentimentbyTopic.Add(new DataPoint(allSentimentsbyTopic[key][item], key));
+                        }
+                        else if (string.Compare(item, "NEUTRAL", true) == 0)
+                        {
+                            neutralSentimentbyTopic.Add(new DataPoint(allSentimentsbyTopic[key][item], key));
+                        }
+
+                    }
+
+                   
+                }
+
+                ViewBag.NegativeSentimentbyTopic = JsonConvert.SerializeObject(negativeSentimentbyTopic, _jsonSetting);
+                ViewBag.PositiveSentimentbyTopic = JsonConvert.SerializeObject(positiveSentimentbyTopic, _jsonSetting);
+                ViewBag.NeutralSentimentbyTopic = JsonConvert.SerializeObject(neutralSentimentbyTopic, _jsonSetting);
+                //logger.Log(negativeSentimentbyTopic.Count+" : "+ 
+                //    positiveSentimentbyTopic.Count + " : "+ neutralSentimentbyTopic.Count+" : "+ allSentimentsbyTopic.Keys.Count);
+                //Highcharts overAllSentimentChart = barChartSentimentsByCount("OverAllSentimentsCount", topics, allSentimentsbyTopic);
+
+                return PartialView();
             }
             catch (Exception ex)
             {
+                //error = ex.StackTrace;
                 logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
-                return null;
+                ViewBag.NegativeSentimentbyTopic = JsonConvert.SerializeObject(dummylist, _jsonSetting);
+                ViewBag.PositiveSentimentbyTopic = JsonConvert.SerializeObject(dummylist, _jsonSetting);
+                ViewBag.NeutralSentimentbyTopic = JsonConvert.SerializeObject(dummylist, _jsonSetting);
+                return PartialView();
 
             }
 
 
         }
+        
 
-
-        private static Highcharts lineChartSentiment(string chartName, string[] xDataMonths, object[] yDataCounts, object[] yDataAvgSentimentCounts)
-        {
-            return new Highcharts(chartName)
-
-                .InitChart(new Chart { DefaultSeriesType = DotNet.Highcharts.Enums.ChartTypes.Line })
-                .SetTitle(new Title { Text = "Tweets per 5 sec" })
-                .SetSubtitle(new Subtitle { Text = "Overall Status" })
-                .SetXAxis(new XAxis { Categories = xDataMonths, Labels = new XAxisLabels { Rotation = -90 } })
-                .SetYAxis(new[] { new YAxis { Title = new YAxisTitle { Text = "Count" } }
-                //,new YAxis { Min=0,Max=4,TickInterval=2,Labels=new YAxisLabels { Formatter="function() { if(this.value==0){return 'Negative';} if(this.value==2){return 'Positive';}}"},Opposite=true } 
-                } 
-                    )
-                .SetTooltip(new Tooltip
-                {
-                    Enabled = true,
-                    Formatter = @"function(){
-
-    return '<b> '+this.series.name+' </b></br>'+this.x+' : '+this.y; 
-  
-
-}"
-                })
-                            .SetPlotOptions(new PlotOptions
-                            {
-                                Line = new PlotOptionsLine
-                                {
-                                    DataLabels = new PlotOptionsLineDataLabels
-                                    {
-                                        Enabled = true
-                                    },
-                                    EnableMouseTracking = false
-                                }
-
-                            })
-                            .SetSeries(new[]
-                            {
-
-                                new Series { Name="Total Tweets",Data=new Data(yDataCounts) },
-                                new Series { Name="Avg Sentiment",Data=new Data(yDataAvgSentimentCounts) }
-
-                            });
-        }
-
-
-        private static Highcharts barChartTweetsByTopic(string chartName, string[] xAxisPlot, object[] yAxisData)
-        {
-            return new Highcharts(chartName)
-
-                .InitChart(new Chart { DefaultSeriesType = DotNet.Highcharts.Enums.ChartTypes.Column })
-                .SetTitle(new Title { Text = "" })
-                .SetSubtitle(new Subtitle { Text = "Total no. of Tweets" })
-                .SetXAxis(new XAxis { Categories = xAxisPlot, Labels = new XAxisLabels { Rotation = -90 } })
-                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Tweets Count" } })
-                .SetTooltip(new Tooltip
-                {
-                    Enabled = true,
-                    Formatter = @"function(){return '<b> '+this.series.name+'</b> </br> '+this.x+' : '+this.y; }"
-                })
-                            .SetPlotOptions(new PlotOptions
-                            {
-                                Line = new PlotOptionsLine
-                                {
-                                    DataLabels = new PlotOptionsLineDataLabels
-                                    {
-                                        Enabled = true
-                                    },
-                                    EnableMouseTracking = false
-                                }
-
-                            })
-                            .SetSeries(new[]
-                            {
-
-                                new Series { Name=" Topics ",Data=new Data(yAxisData) }
-                               // new Series { Name="Skype",Data=new Data(yAxisData2) }
-
-                            });
-        }
-
-        private static Highcharts barChartSentimentsByCount(string chartName, string[] xAxisPlot, Dictionary<string, Dictionary<string, int>> overAllSentimentChart)
-        {
-            List<Series> yAxisData = new List<Series>();
-
-            string[] sentimentScoreCounter = new string[] { "NEGATIVE", "POSITIVE", "NEUTRAL" };
-            foreach (string item in sentimentScoreCounter)
-            {
-                List<object> data = new List<object>();
-                foreach (string key in overAllSentimentChart.Keys)
-                {
-                    data.Add(overAllSentimentChart[key][item]);
-                }
-
-                yAxisData.Add(new Series()
-                {
-                    Name = item,
-                    Data = new Data(data.ToArray())
-                });
-            }
-
-
-
-
-
-            return new Highcharts(chartName)
-
-                .InitChart(new Chart { DefaultSeriesType = DotNet.Highcharts.Enums.ChartTypes.Column })
-                .SetTitle(new Title { Text = "" })
-                .SetSubtitle(new Subtitle { Text = "Count of Tweets by Sentiments" })
-                .SetXAxis(new XAxis { Categories = xAxisPlot })
-                .SetYAxis(new YAxis { Title = new YAxisTitle { Text = "Tweets Count" } })
-                .SetTooltip(new Tooltip
-                {
-                    Enabled = true,
-                    Formatter = @"function(){return '<b> '+this.series.name+'</b> </br> '+this.x+' : '+this.y; }"
-                })
-                            .SetPlotOptions(new PlotOptions
-                            {
-                                Line = new PlotOptionsLine
-                                {
-                                    DataLabels = new PlotOptionsLineDataLabels
-                                    {
-                                        Enabled = true
-                                    },
-                                    EnableMouseTracking = false
-                                }
-
-                            })
-                            .SetSeries(
-
-
-                               yAxisData.ToArray()
-                            // new Series { Name="Skype",Data=new Data(yAxisData2) }
-
-                            );
-        }
 
     }
 }

@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class DAOTweetMentions : AzureSQLDBConn_BaseData
@@ -296,7 +297,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<DAOTweetMentions> SelectLatest()
+		public static IList<DAOTweetMentions> SelectLatest(string userId)
         {
             SqlCommand command = new SqlCommand();
             command.CommandText = InlineProcs.ctprTweetMentions_SelectLatest;
@@ -309,6 +310,7 @@ namespace TwitterAnalyticsDBL.DataObjects
             try
             {
                 command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, true, 0, 0, "", DataRowVersion.Proposed, (object)userId ?? (object)DBNull.Value));
 
                 staticConnection.Open();
                 sqlAdapter.Fill(dt);
@@ -347,7 +349,67 @@ namespace TwitterAnalyticsDBL.DataObjects
             }
         }
 
+        ///<Summary>
+		///Select Latest 10 Mentions
+		///This method returns all data rows in the table TweetMentions
+		///</Summary>
+		///<returns>
+		///IList-DAOTweetMentions.
+		///</returns>
+		///<parameters>
+		///
+		///</parameters>
+		public static IList<DAOTweetMentions> SelectDistinctTopics(string userId)
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetMentions_SelectDistinctTopics;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
 
+            DataTable dt = new DataTable("TweetMentions");
+            SqlDataAdapter sqlAdapter = new SqlDataAdapter(command);
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, true, 0, 0, "", DataRowVersion.Proposed, (object)userId ?? (object)DBNull.Value));
+
+                staticConnection.Open();
+                sqlAdapter.Fill(dt);
+
+                int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (errorCode > 1)
+                    throw new Exception("procedure ctprTweetMentions_SelectAll returned error code: " + errorCode);
+
+                List<DAOTweetMentions> objList = new List<DAOTweetMentions>();
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        DAOTweetMentions retObj = new DAOTweetMentions();
+                        //retObj._id = Convert.IsDBNull(row["Id"]) ? (Int64?)null : (Int64?)row["Id"];
+                        //retObj._time = Convert.IsDBNull(row["time"]) ? DateTime.MinValue : (DateTime)row["time"];
+                        retObj._topic = Convert.IsDBNull(row["topic"]) ? null : (string)row["topic"];
+                        //retObj._count = Convert.IsDBNull(row["count"]) ? (Int64?)null : (Int64?)row["count"];
+                        //retObj._avg = Convert.IsDBNull(row["avg"]) ? (double?)null : Math.Round((double)row["avg"], 2);
+                        //retObj._min = Convert.IsDBNull(row["min"]) ? (double?)null : (double?)row["min"];
+                        //retObj._max = Convert.IsDBNull(row["max"]) ? (double?)null : (double?)row["max"];
+                        //retObj._stdev = Convert.IsDBNull(row["stdev"]) ? (double?)null : (double?)row["stdev"];
+                        objList.Add(retObj);
+                    }
+                }
+                return objList;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
 
         ///<Summary>
         ///</Summary>
@@ -785,8 +847,17 @@ namespace TwitterAnalyticsDBL.DataObjects
 			[time]			
 			,sum([count]) as 'count',
             avg([avg]) as 'avg'			
-			FROM[dbo].[TweetMentions]
+			FROM[dbo].[TweetMentions] where UserId=@UserId
             group by time order by[time] desc 
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+        internal static string ctprTweetMentions_SelectDistinctTopics = @"
+			-- Select Latest 10
+			-- selects all rows from the table
+			-- returning the error code if any
+			select distinct topic from tweetmentions where UserId=@UserId            
 			-- returning the error code if any
 			SELECT @ErrorCode = @@ERROR
 			";

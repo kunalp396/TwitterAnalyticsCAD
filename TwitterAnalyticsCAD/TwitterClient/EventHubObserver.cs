@@ -67,7 +67,7 @@ namespace TwitterClient
 
         public void OnError(Exception error)
         {
-            logger.Log(error.StackTrace, LOGLEVELS.ERROR);
+           // logger.Log(error.StackTrace, LOGLEVELS.ERROR);
         }
 
     }

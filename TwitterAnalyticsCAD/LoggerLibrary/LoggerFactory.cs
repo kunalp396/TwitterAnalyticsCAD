@@ -20,11 +20,9 @@ namespace TwitterAnalyticsCommon
             get
             {
                 if (mLogger == null)
-                {
-                    lock (mLock)
-                    {
+                {                   
                         mLogger = new LoggerFactory<T>();
-                    }
+                   
                 }
                 return mLogger;
             }

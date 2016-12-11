@@ -20,8 +20,7 @@ namespace TwitterAnalyticsWeb.Controllers
         private ApplicationUserManager _userManager;
         public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
         private IAuthenticationManager _authnManager;
-
-
+              
 
         public AccountController()
         {
@@ -77,7 +76,8 @@ namespace TwitterAnalyticsWeb.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> 
+         Login(LoginViewModel model, string returnUrl)
         {
             try
             {
@@ -85,10 +85,9 @@ namespace TwitterAnalyticsWeb.Controllers
                 {
                     return View(model);
                 }
-
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, change to shouldLockout: true
-                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: true);
                 switch (result)
                 {
                     case SignInStatus.Success:
@@ -96,7 +95,7 @@ namespace TwitterAnalyticsWeb.Controllers
                     case SignInStatus.LockedOut:
                         return View("Lockout");
                     case SignInStatus.RequiresVerification:
-                        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                        return RedirectToAction("SendCode", new { ReturnUrl = Url.Encode(returnUrl), RememberMe = model.RememberMe });
                     case SignInStatus.Failure:
                     default:
                         ModelState.AddModelError("", "Invalid login attempt.");
@@ -106,7 +105,7 @@ namespace TwitterAnalyticsWeb.Controllers
             }
             catch (Exception ex)
             {
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
                 return View("Error");
             }
         }

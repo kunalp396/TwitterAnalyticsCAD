@@ -6,7 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using TwitterAnalyticsWeb.Models;
-
+using Microsoft.Owin.Security.DataProtection;
 namespace TwitterAnalyticsWeb
 {
     public partial class Startup
@@ -18,6 +18,8 @@ namespace TwitterAnalyticsWeb
             app.CreatePerOwinContext(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
+
+            app.SetDataProtectionProvider(new MachineKeyProtectionProvider());
 
             // Enable the application to use a cookie to store information for the signed in user
             // and to use a cookie to temporarily store information about a user logging in with a third party login provider
@@ -65,4 +67,35 @@ namespace TwitterAnalyticsWeb
             //});
         }
     }
+
+    internal class MachineKeyProtectionProvider : IDataProtectionProvider
+    {
+        public IDataProtector Create(params string[] purposes)
+        {
+            return new MachineKeyDataProtector(purposes);
+        }
+    }
+
+    internal class MachineKeyDataProtector : IDataProtector
+    {
+        private readonly string[] _purposes;
+
+        public MachineKeyDataProtector(string[] purposes)
+        {
+            _purposes = purposes;
+        }
+
+        public byte[] Protect(byte[] userData)
+        {
+            //return MachineKey.Protect(userData, _purposes);
+            return userData;
+        }
+
+        public byte[] Unprotect(byte[] protectedData)
+        {
+            //return System.Web.Security.MachineKey.Unprotect(protectedData, _purposes);
+            return protectedData;
+        }
+    }
+
 }

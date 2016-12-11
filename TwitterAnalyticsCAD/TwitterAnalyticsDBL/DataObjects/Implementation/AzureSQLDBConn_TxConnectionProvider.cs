@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Configuration;
 using TwitterAnalyticsCommon;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class AzureSQLDBConn_TxConnectionProvider : IDisposable

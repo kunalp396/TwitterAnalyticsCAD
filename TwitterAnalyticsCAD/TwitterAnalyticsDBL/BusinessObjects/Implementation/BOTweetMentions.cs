@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using TwitterAnalyticsCommon;
 using TwitterAnalyticsDBL.DataObjects;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.BusinessObjects
 {
 	///<Summary>
@@ -75,7 +76,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 				throw;
 			}
 		}
@@ -105,7 +106,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -151,7 +152,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			catch(Exception ex)
 			{
 				RollbackTransaction("savenewBOTweetMentions");
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -198,7 +199,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			catch(Exception ex)
 			{
 				RollbackTransaction("updateBOTweetMentions");
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -227,7 +228,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			catch(Exception ex)
 			{
 				RollbackTransaction("deleteBOTweetMentions");
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -253,7 +254,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
             }
             catch (Exception ex)
             {
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
             }
@@ -283,11 +284,41 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
 		}
+
+        ///<Summary>
+        ///TweetMentionsCollection
+        ///This method returns the collection of BOTweetMentions objects
+        ///</Summary>
+        ///<returns>
+        ///List[BOTweetMentions]
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static IList<BOTweetMentions> TweetMentionsDistinctTopics(string userId)
+        {
+            try
+            {
+                IList<BOTweetMentions> boTweetMentionsCollection = new List<BOTweetMentions>();
+                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectDistinctTopics(userId);
+
+                foreach (DAOTweetMentions daoTweetMentions in daoTweetMentionsCollection)
+                    boTweetMentionsCollection.Add(new BOTweetMentions(daoTweetMentions));
+
+                return boTweetMentionsCollection;
+            }
+            catch (Exception ex)
+            {
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
+            }
+        }
 
         ///<Summary>
 		///TweetMentionsLatestTen
@@ -299,12 +330,12 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<BOTweetMentions> TweetMentionsLatest()
+		public static IList<BOTweetMentions> TweetMentionsLatest(string userId)
         {
             try
             {
                 IList<BOTweetMentions> boTweetMentionsCollection = new List<BOTweetMentions>();
-                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatest();
+                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatest(userId);
 
                 foreach (DAOTweetMentions daoTweetMentions in daoTweetMentionsCollection)
                     boTweetMentionsCollection.Add(new BOTweetMentions(daoTweetMentions));
@@ -313,7 +344,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
             }
             catch(Exception ex)
             {
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw ex;
             }
@@ -339,7 +370,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -379,7 +410,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}
@@ -414,7 +445,7 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			}
 			catch(Exception ex)
 			{
-                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
                 throw;
 			}

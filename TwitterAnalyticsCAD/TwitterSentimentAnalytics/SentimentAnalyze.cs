@@ -9,6 +9,7 @@
 // 
 //*********************************************************
 
+//source:http://help.sentiment140.com/api
 using Newtonsoft.Json.Linq;
 using System;
 using System.Globalization;

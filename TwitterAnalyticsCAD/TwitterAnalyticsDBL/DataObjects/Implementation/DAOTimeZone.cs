@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class DAOTimeZone : AzureSQLDBConn_BaseData

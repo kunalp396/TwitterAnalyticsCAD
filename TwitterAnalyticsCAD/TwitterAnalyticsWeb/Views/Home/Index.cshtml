@@ -5,34 +5,40 @@
 
 <div class="jumbotron">
     <h3>Twitter Real Time Sentiment Analysis</h3>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </div>
     <div class="row">
-        <div id="FinalGraph" class="col-md-7">
-            @{
-
-                Html.RenderAction("FinalGraph", "DashBoard");
-            }
-        </div>
-        <div id="LiveTweets" >
+        <div id="LiveTweets" style="max-width:600px;max-height:400px" >
             @{
 
                 Html.RenderAction("LiveTweets", "DashBoard");
             }
         </div>
+        <div id="FinalGraph" style="position:absolute;top:250px;left:55%" >
+            @{
+
+            Html.RenderAction("FinalGraph", "DashBoard");
+            }          
+
+        </div>
+       
     </div>
     <div class="row">
-        <div id="TotalSentimentsPerSub" class="col-md-7">
+        <div id="TotalSentimentsPerSub" style="position:absolute;top:700px;left:15%">
             @{
-                Html.RenderAction("OverAllSentimentsCount", "DashBoard");
+               Html.RenderAction("OverAllSentimentsCount", "DashBoard");
             }
         </div>
-        <div id="NoOfTweetsPerSub" class="col-md-5">
+        <div id="NoOfTweetsPerSub" style="position:absolute;top:710px;left:55%">
             @{
                 Html.RenderAction("OverAllTweets", "DashBoard");
             }
         </div>
 
     </div>
+<div class="row" style="height:150px">
+
+</div>
 
 <script>
     $(document).ready(function () {
@@ -63,51 +69,50 @@
     <script src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
     <script src="~/signalr/hubs"></script>
-
+    <script src="~/Scripts/purl.js"></script>
     <!--SignalR script to update the chat page and send messages.-->
     <script>
         $(function () {
             // Reference the auto-generated proxy for the hub.
             var chat = $.connection.liveTweetsPushNotification;
+            //$.connection.hub.logging = true;
             // Create a function that the hub can call back to display messages.
             chat.client.sendTweetsToPage = function (time, message) {
                 // Add the message to the page.
-                // alert('got message')
+                 //alert('got message')
                 $('#discussion').prepend('<li><strong>' + htmlEncode(time)
                     + '</strong>: ' + htmlEncode(message) + '</li>');
 
             };
-
-          
-            function getUrlVars() {
-                var vars = [], hash;
-                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-                for (var i = 0; i < hashes.length; i++) {
-                    hash = hashes[i].split('=');
-                    vars.push(hash[0]);
-                    vars[hash[0]] = hash[1];
-                }
-                return vars;
-            }
+                     
+            
             // Start the connection.
             $.connection.hub.start().done(function () {
-
+                //alert('ConnectionDone');
                 // Call the Send method on the hub.
-                $(document).ready(function () {
+               // $(document).ready(function () {
                     //alert('sending data');
+                    //console.log($.url().param('UserId'));
                     chat.server.sendTweets('start');
-                    chat.server.analyzeData(getUrlVars()['UserId']);
+                    chat.server.analyzeData($.url().param('UserId'));
                     
-                });
+               // });
                 // chat.server.sendTweets($('#displayname').val(), $('#message').val());
                 // Clear text box and reset focus for next comment.
                 //$('#message').val('').focus();
 
             });
+
+            $.connection.hub.error(function (error) {
+                  // alert('got error');
+                console.log('SignalR error: ' + error)
+            });
+
+
         });
 
         window.onbeforeunload = function (e) {
-           // alert('Closing Hub');
+           //alert('Closing Hub');
             $.connection.hub.stop();
         };
         // This optional function html-encodes messages for display in the page.
