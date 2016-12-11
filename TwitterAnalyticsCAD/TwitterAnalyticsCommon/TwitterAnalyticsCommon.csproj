@@ -4,13 +4,29 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{670CC8D5-500F-4288-98DC-6591668D854F}</ProjectGuid>
+    <ProjectGuid>{22C54712-8933-4BDB-8C76-54910D6BEABA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TwitterAnalyticsDBL</RootNamespace>
-    <AssemblyName>TwitterAnalyticsDBL</AssemblyName>
+    <RootNamespace>TwitterAnalyticsCommon</RootNamespace>
+    <AssemblyName>TwitterAnalyticsCommon</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,7 +41,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -41,28 +57,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BusinessObjects\Implementation\AzureSQLDBConn_BaseBusiness.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTimeZone.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetCount.cs" />
-    <Compile Include="BusinessObjects\Implementation\BOTweetMentions.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_BaseData.cs" />
-    <Compile Include="DataObjects\Implementation\AzureSQLDBConn_TxConnectionProvider.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTimeZone.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetCount.cs" />
-    <Compile Include="DataObjects\Implementation\DAOTweetMentions.cs" />
+    <Compile Include="AzureSQLConnMngr.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LoggerLibrary\LoggerLibrary.csproj">
-      <Project>{b4b7f6d2-ad57-4faf-afb7-97e9abfe362b}</Project>
+      <Project>{B4B7F6D2-AD57-4FAF-AFB7-97E9ABFE362B}</Project>
       <Name>LoggerLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
-      <Project>{22C54712-8933-4BDB-8C76-54910D6BEABA}</Project>
-      <Name>TwitterAnalyticsCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

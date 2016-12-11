@@ -19,6 +19,7 @@ using System.Runtime.Serialization.Json;
 using System.Security.Cryptography;
 using System.Text;
 
+//source:https://dev.twitter.com/oauth/overview/single-user
 namespace TwitterClient
 {
     public struct TwitterConfig
@@ -201,7 +202,7 @@ namespace TwitterClient
         public string TweetText;
         public bool Retweeted;
         public string RetweetCount;
-
+        public string UserId;
 
         public override string ToString()
         {

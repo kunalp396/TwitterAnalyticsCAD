@@ -17,33 +17,14 @@ using System.Net;
 using System.Text;
 using System.Web;
 
+//source:http://help.sentiment140.com/api
 namespace TwitterClient
 {
     public static class Sentiment
     {
         private static string sentimentURIFormatter = "http://www.sentiment140.com/api/classify?text={0}";
 
-        public static TwitterPayload ComputeScore(Tweet tweet, string twitterKeywords)
-        {
-
-            return new TwitterPayload
-            {
-                ID = tweet.Id,
-                CreatedAt = ParseTwitterDateTime(tweet.CreatedAt),
-                UserName = tweet.User != null ? tweet.User.Name : null,
-                TimeZone = tweet.User != null ? (tweet.User.TimeZone != null ? tweet.User.TimeZone : "(unknown)") : "(unknown)", 
-                ProfileImageUrl = tweet.User != null ? (tweet.User.ProfileImageUrl != null ? tweet.User.ProfileImageUrl : "(unknown)") : "(unknown)",
-                Text = tweet.Text,
-                Retweeted= tweet.Retweeted,
-                RetweetCount=tweet.RetweetCount,
-                Language = tweet.Language != null ? tweet.Language : "(unknown)",
-                RawJson = tweet.RawJson,
-                SentimentScore = (int)Analyze(tweet.Text),
-                Topic = DetermineTopic(tweet.Text, twitterKeywords),
-            };
-        }
-
-        static DateTime ParseTwitterDateTime(string p)
+        public static DateTime ParseTwitterDateTime(string p)
         {
             if (p == null)
                 return DateTime.Now;
@@ -99,8 +80,7 @@ namespace TwitterClient
             }
             catch (Exception e)
             {
-                //Console.WriteLine("Sentiment calculation FAILED with:/n{0}", e);
-                return SentimentScore.Neutral;
+                throw e;
             }
         }
 
@@ -148,6 +128,26 @@ namespace TwitterClient
             }
 
             return "Unknown";
+        }
+
+        public static TwitterPayload ComputeScore(Tweet tweet, string twitterKeywords)
+        {
+
+            return new TwitterPayload
+            {
+                ID = tweet.Id,
+                CreatedAt = Sentiment.ParseTwitterDateTime(tweet.CreatedAt),
+                UserName = tweet.User != null ? tweet.User.Name : null,
+                TimeZone = tweet.User != null ? (tweet.User.TimeZone != null ? tweet.User.TimeZone : "(unknown)") : "(unknown)",
+                ProfileImageUrl = tweet.User != null ? (tweet.User.ProfileImageUrl != null ? tweet.User.ProfileImageUrl : "(unknown)") : "(unknown)",
+                Text = tweet.Text,
+                Retweeted = tweet.Retweeted,
+                RetweetCount = tweet.RetweetCount,
+                Language = tweet.Language != null ? tweet.Language : "(unknown)",
+                RawJson = tweet.RawJson,
+                SentimentScore = (int)Sentiment.Analyze(tweet.Text),
+                Topic = Sentiment.DetermineTopic(tweet.Text, twitterKeywords),
+            };
         }
     }
 }

@@ -4,9 +4,49 @@
    
 }
 
-@model DotNet.Highcharts.Highcharts
+@*@model DotNet.Highcharts.Highcharts*@
 
 <p></p>
-@(Model)
+@*@(Model)*@
+<div id="LineChart_FinalGraph"></div>
+<script type="text/javascript">
+
+    var chart = new CanvasJS.Chart("LineChart_FinalGraph", {
+                    theme: "theme2",
+                    height: 400,
+                width:500,
+				animationEnabled: true,
+				title: {
+					text: ""
+				},
+				subtitles: [
+					{ text: "Tweet per 5 sec" }
+				],
+				axisX:{				    			  
+				labelAngle: -50
+    },
+				data: [
+				{
+				    type: "line", //change type to bar, line, area, pie, etc
+				    showInLegend: true,
+				    legendText: "TweetCount",
+					dataPoints:  @Html.Raw(ViewBag.TweetCountSeries),
+                                        //Uncomment below line to add data coming from the controller.
+					//dataPoints: @Html.Raw(ViewBag.DataPoints),
+				},
+                {
+                    type: "line", //change type to bar, line, area, pie, etc
+                    showInLegend: true,
+
+                    legendText: "AvgSentiments (0:NG,2:NE,4:P)",
+                    dataPoints:  @Html.Raw(ViewBag.AvgSentimentSeries),
+
+                }
+				]
+			});
+			chart.render();
+
+</script>
+
 
 

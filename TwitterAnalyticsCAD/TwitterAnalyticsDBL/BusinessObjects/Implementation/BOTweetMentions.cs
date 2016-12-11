@@ -5,8 +5,10 @@
 **************************************************************/
 using System;
 using System.Collections.Generic;
+using TwitterAnalyticsCommon;
 using TwitterAnalyticsDBL.DataObjects;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.BusinessObjects
 {
 	///<Summary>
@@ -25,22 +27,26 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		protected double? _max;
 		protected double? _stdev;
 		protected bool _isDirty = false;
-		/*collection member objects*******************/
-		/*********************************************/
-		#endregion
 
-		#region class methods
-		///<Summary>
-		///Constructor
-		///This is the default constructor
-		///</Summary>
-		///<returns>
-		///void
-		///</returns>
-		///<parameters>
-		///
-		///</parameters>
-		public BOTweetMentions()
+        private static ILogger logger = LoggerFactory<ILogger>.Create(typeof(DALLogger));
+
+
+        /*collection member objects*******************/
+        /*********************************************/
+        #endregion
+
+        #region class methods
+        ///<Summary>
+        ///Constructor
+        ///This is the default constructor
+        ///</Summary>
+        ///<returns>
+        ///void
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public BOTweetMentions()
 		{
 		}
 
@@ -68,8 +74,9 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_max = daoTweetMentions.Max;
 				_stdev = daoTweetMentions.Stdev;
 			}
-			catch
+			catch(Exception ex)
 			{
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 				throw;
 			}
 		}
@@ -97,9 +104,11 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_max = daoTweetMentions.Max;
 				_stdev = daoTweetMentions.Stdev;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 
@@ -140,10 +149,12 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_stdev = daoTweetMentions.Stdev;
 				_isDirty = false;
 			}
-			catch
+			catch(Exception ex)
 			{
 				RollbackTransaction("savenewBOTweetMentions");
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 		
@@ -185,10 +196,12 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				_stdev = daoTweetMentions.Stdev;
 				_isDirty = false;
 			}
-			catch
+			catch(Exception ex)
 			{
 				RollbackTransaction("updateBOTweetMentions");
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 		///<Summary>
@@ -212,24 +225,52 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				daoTweetMentions.Delete();
 				CommitTransaction();
 			}
-			catch
+			catch(Exception ex)
 			{
 				RollbackTransaction("deleteBOTweetMentions");
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
-		
-		///<Summary>
-		///TweetMentionsCollection
-		///This method returns the collection of BOTweetMentions objects
+
+        ///<Summary>
+		///Delete
+		///This method deletes one TweetMentions record from the store
 		///</Summary>
 		///<returns>
-		///List[BOTweetMentions]
+		///void
 		///</returns>
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<BOTweetMentions> TweetMentionsCollection()
+		public static void DeleteAll(string UserId)
+        {
+            DAOTweetMentions daoTweetMentions = new DAOTweetMentions();
+            try
+            {
+                daoTweetMentions.DeleteAll(UserId);
+                
+            }
+            catch (Exception ex)
+            {
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
+            }
+        }
+
+        ///<Summary>
+        ///TweetMentionsCollection
+        ///This method returns the collection of BOTweetMentions objects
+        ///</Summary>
+        ///<returns>
+        ///List[BOTweetMentions]
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static IList<BOTweetMentions> TweetMentionsCollection()
 		{
 			try
 			{
@@ -241,11 +282,43 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			
 				return boTweetMentionsCollection;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
+
+        ///<Summary>
+        ///TweetMentionsCollection
+        ///This method returns the collection of BOTweetMentions objects
+        ///</Summary>
+        ///<returns>
+        ///List[BOTweetMentions]
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static IList<BOTweetMentions> TweetMentionsDistinctTopics(string userId)
+        {
+            try
+            {
+                IList<BOTweetMentions> boTweetMentionsCollection = new List<BOTweetMentions>();
+                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectDistinctTopics(userId);
+
+                foreach (DAOTweetMentions daoTweetMentions in daoTweetMentionsCollection)
+                    boTweetMentionsCollection.Add(new BOTweetMentions(daoTweetMentions));
+
+                return boTweetMentionsCollection;
+            }
+            catch (Exception ex)
+            {
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
+            }
+        }
 
         ///<Summary>
 		///TweetMentionsLatestTen
@@ -257,12 +330,12 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<BOTweetMentions> TweetMentionsLatest()
+		public static IList<BOTweetMentions> TweetMentionsLatest(string userId)
         {
             try
             {
                 IList<BOTweetMentions> boTweetMentionsCollection = new List<BOTweetMentions>();
-                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatest();
+                IList<DAOTweetMentions> daoTweetMentionsCollection = DAOTweetMentions.SelectLatest(userId);
 
                 foreach (DAOTweetMentions daoTweetMentions in daoTweetMentionsCollection)
                     boTweetMentionsCollection.Add(new BOTweetMentions(daoTweetMentions));
@@ -271,6 +344,8 @@ namespace TwitterAnalyticsDBL.BusinessObjects
             }
             catch(Exception ex)
             {
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
                 throw ex;
             }
         }
@@ -293,9 +368,11 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				Int32 objCount = DAOTweetMentions.SelectAllCount();
 				return objCount;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 		
@@ -331,9 +408,11 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 			
 				return boTweetMentionsCollection;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 		
@@ -364,9 +443,11 @@ namespace TwitterAnalyticsDBL.BusinessObjects
 				Int32 objCount = DAOTweetMentions.SelectAllBySearchFieldsCount(daoTweetMentions);
 				return objCount;
 			}
-			catch
+			catch(Exception ex)
 			{
-				throw;
+                //logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
+
+                throw;
 			}
 		}
 		

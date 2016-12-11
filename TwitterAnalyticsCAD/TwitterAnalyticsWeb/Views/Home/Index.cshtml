@@ -5,34 +5,40 @@
 
 <div class="jumbotron">
     <h3>Twitter Real Time Sentiment Analysis</h3>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </div>
     <div class="row">
-        <div id="FinalGraph" class="col-md-7">
-            @{
-
-                Html.RenderAction("FinalGraph", "DashBoard");
-            }
-        </div>
-        <div id="LiveTweet" >
+        <div id="LiveTweets" style="max-width:600px;max-height:400px" >
             @{
 
                 Html.RenderAction("LiveTweets", "DashBoard");
             }
         </div>
+        <div id="FinalGraph" style="position:absolute;top:250px;left:55%" >
+            @{
+
+            Html.RenderAction("FinalGraph", "DashBoard");
+            }          
+
+        </div>
+       
     </div>
     <div class="row">
-        <div id="TotalSentimentsPerSub" class="col-md-7">
+        <div id="TotalSentimentsPerSub" style="position:absolute;top:700px;left:15%">
             @{
-                Html.RenderAction("OverAllSentimentsCount", "DashBoard");
+               Html.RenderAction("OverAllSentimentsCount", "DashBoard");
             }
         </div>
-        <div id="NoOfTweetsPerSub" class="col-md-5">
+        <div id="NoOfTweetsPerSub" style="position:absolute;top:710px;left:55%">
             @{
                 Html.RenderAction("OverAllTweets", "DashBoard");
             }
         </div>
 
     </div>
+<div class="row" style="height:150px">
+
+</div>
 
 <script>
     $(document).ready(function () {
@@ -43,7 +49,13 @@
                 $(window).scrollTop(scrollPosition);
             });
 
-        }, 5000); 
+
+            $('#TotalSentimentsPerSub').load('@(Url.Action("OverAllSentimentsCount", "DashBoard", null, Request.Url.Scheme))');
+
+            $('#NoOfTweetsPerSub').load('@(Url.Action("OverAllTweets", "DashBoard", null, Request.Url.Scheme))');
+
+
+        }, 5000);
     });
 
 
@@ -57,59 +69,52 @@
     <script src="~/Scripts/jquery-1.10.2.min.js"></script>
     <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
     <script src="~/signalr/hubs"></script>
-
+    <script src="~/Scripts/purl.js"></script>
     <!--SignalR script to update the chat page and send messages.-->
     <script>
         $(function () {
             // Reference the auto-generated proxy for the hub.
             var chat = $.connection.liveTweetsPushNotification;
+            //$.connection.hub.logging = true;
             // Create a function that the hub can call back to display messages.
             chat.client.sendTweetsToPage = function (time, message) {
                 // Add the message to the page.
-                // alert('got message')
+                 //alert('got message')
                 $('#discussion').prepend('<li><strong>' + htmlEncode(time)
                     + '</strong>: ' + htmlEncode(message) + '</li>');
 
             };
-
-           // chat.client.sendTweetCountWithTopic = function (topic, count) {
-                // Add the message to the page.
-                //alert('got message')
-                //var timer = 1;
-                //if (timer == 1)
-               // {
-                    // alert($('#'+topic).length == 0);
-                    //alert($('#' + topic).length);
-                    //  timer = 2;
-               // }
-                //if ($('#' + topic).length == 0) {
-                //    $('#tweetsCountWithTopic').append('<div id="' + topic +
-                //        '"  style="height:50px; margin: 0px 5px 5px 0px;text-align:center;background-color:green;" > <div ><b>'
-                //        + htmlEncode(topic)
-                //        + '</b> </div><div> ' + htmlEncode(count) + '</div></div>');
-
-
-                //}
-
-                //var noOfColumns = (12 / $('#tweetsCountWithTopic').children().length) - 1;
-                //$('#' + topic).attr('class', 'col-md-' + noOfColumns);
-            //};
-
+                     
+            
             // Start the connection.
             $.connection.hub.start().done(function () {
-
+                //alert('ConnectionDone');
                 // Call the Send method on the hub.
-                $(document).ready(function () {
+               // $(document).ready(function () {
                     //alert('sending data');
+                    //console.log($.url().param('UserId'));
                     chat.server.sendTweets('start');
-                    chat.server.analyzeData('winter');
-                });
+                    chat.server.analyzeData($.url().param('UserId'));
+                    
+               // });
                 // chat.server.sendTweets($('#displayname').val(), $('#message').val());
                 // Clear text box and reset focus for next comment.
                 //$('#message').val('').focus();
 
             });
+
+            $.connection.hub.error(function (error) {
+                  // alert('got error');
+                console.log('SignalR error: ' + error)
+            });
+
+
         });
+
+        window.onbeforeunload = function (e) {
+           //alert('Closing Hub');
+            $.connection.hub.stop();
+        };
         // This optional function html-encodes messages for display in the page.
         function htmlEncode(value) {
             var encodedValue = $('<div />').text(value).html();

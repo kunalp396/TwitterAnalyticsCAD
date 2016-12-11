@@ -4,7 +4,44 @@
 
 }
 
-@model DotNet.Highcharts.Highcharts
+@*@model DotNet.Highcharts.Highcharts*@
 
 <p></p>
-@(Model)
+@*@(Model)*@
+
+<div id="BarChart_TweetSpeeder"></div>
+<script type="text/javascript">
+
+
+    var chart = new CanvasJS.Chart("BarChart_TweetSpeeder", {
+                    theme: "theme2",
+                    height: 350,
+                width:500,
+				animationEnabled: true,
+				title: {
+					text: ""
+				},
+				toolTip: {
+				    shared: true,
+				    contentFormatter: function (e) {
+				        var content = " ";
+				        for (var i = 0; i < e.entries.length; i++) {
+				            content +=  " Speed: " + "<strong>" + e.entries[i].dataPoint.y + "</strong> Tweets per 5 sec";
+				            content += "<br/>";
+				        }
+				        return content;
+				    }
+				},
+				subtitles: [
+					{ text: "Recent Tweets per seconds" }
+				],
+				data: [
+				{
+				    type: "column", //change type to bar, line, area, pie, etc
+					dataPoints:  @Html.Raw(ViewBag.TopicSpeeder),
+				}
+				]
+			});
+			chart.render();
+
+</script>

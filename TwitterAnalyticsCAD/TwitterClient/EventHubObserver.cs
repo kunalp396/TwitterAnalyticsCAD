@@ -17,16 +17,17 @@ using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System.Configuration;
+using TwitterAnalyticsCommon;
 
-
+//source:https://docs.microsoft.com/en-us/azure/Event-Hubs/event-hubs-csharp-ephcs-getstarted
 namespace TwitterClient
 {
     public class EventHubObserver : IObserver<Payload>
     {
         private EventHubConfig _config;
         private EventHubClient _eventHubClient;
-       
-                
+        public ILogger logger = LoggerFactory<ILogger>.Create(typeof(WebLogger));
+
         public EventHubObserver(EventHubConfig config)
         {
             try
@@ -37,7 +38,7 @@ namespace TwitterClient
             }
             catch (Exception ex)
             {
-               
+                logger.Log(ex.StackTrace,LOGLEVELS.ERROR);
             }
 
         }
@@ -49,16 +50,12 @@ namespace TwitterClient
                 var serialisedString = JsonConvert.SerializeObject(TwitterPayloadData);
                 EventData data = new EventData(Encoding.UTF8.GetBytes(serialisedString)) { PartitionKey = TwitterPayloadData.Topic };
                 _eventHubClient.Send(data);
-
-                System.IO.File.AppendAllText(@"F:\wwwwww1.txt", serialisedString);
-
-                //Console.ForegroundColor = ConsoleColor.Yellow;
-                //Console.WriteLine("Sending" + serialisedString + " at: " + TwitterPayloadData.CreatedAt.ToString() );
+                
 
             }
             catch (Exception ex)
             {
-                System.IO.File.AppendAllText(@"F:\wwwwww11.txt", ex.Message+ex.StackTrace);
+                logger.Log(ex.StackTrace, LOGLEVELS.ERROR);
 
             }
 
@@ -71,7 +68,7 @@ namespace TwitterClient
 
         public void OnError(Exception error)
         {
-            
+           // logger.Log(error.StackTrace, LOGLEVELS.ERROR);
         }
 
     }

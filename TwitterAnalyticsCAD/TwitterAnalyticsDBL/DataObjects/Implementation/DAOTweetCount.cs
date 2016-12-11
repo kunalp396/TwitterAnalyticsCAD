@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 
+//source:https://www.codetrigger.com/default.aspx?vwsess=47493
 namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class DAOTweetCount : AzureSQLDBConn_BaseData
@@ -41,7 +42,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<DAOTweetCount> SelectAll()
+		public static IList<DAOTweetCount> SelectAll(string userId)
 		{
 			SqlCommand	command = new SqlCommand();
 			command.CommandText = InlineProcs.ctprTweetCount_SelectAll;
@@ -54,8 +55,10 @@ namespace TwitterAnalyticsDBL.DataObjects
 			try
 			{
 				command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, true, 0, 0, "", DataRowVersion.Proposed, (object)userId?? (object)DBNull.Value));
 
-				staticConnection.Open();
+
+                staticConnection.Open();
 				sqlAdapter.Fill(dt);
 
 				int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
@@ -92,6 +95,63 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
+
+
+        ///<Summary>
+        ///Select all rows
+        ///This method returns all data rows in the table TweetCount
+        ///</Summary>
+        ///<returns>
+        ///IList-DAOTweetCount.
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public static int LatestTweetSpeed(string userId,string topic)
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetCount_LatestTweetSpeed;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
+            object result;
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, true, 0, 0, "", DataRowVersion.Proposed, (object)userId ?? (object)DBNull.Value));
+                command.Parameters.Add(new SqlParameter("@Topic", SqlDbType.NVarChar, 4000, ParameterDirection.Input, true, 0, 0, "", DataRowVersion.Proposed, (object)topic ?? (object)DBNull.Value));
+
+
+                staticConnection.Open();
+                Int32 retCount;
+                result= command.ExecuteScalar();
+                if (result != null)
+                {
+                    retCount =  Convert.ToInt32(result);
+                }
+                else
+                {
+                    retCount = 0;
+                }
+
+                int errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (errorCode > 1)
+                    throw new Exception("procedure ctprTweetCount_SelectAllCount returned error code: " + errorCode);
+
+                return retCount;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
+
+
         ///<Summary>
 		///Select all rows
 		///This method returns all data rows in the table TweetCount
@@ -102,7 +162,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 		///<parameters>
 		///
 		///</parameters>
-		public static IList<DAOTweetCount> SelectAllTweetGreaterThanId(long Id)
+		public static IList<DAOTweetCount> SelectAllTweetGreaterThanId(long Id,string userId)
         {
             SqlCommand command = new SqlCommand();
             command.CommandText = InlineProcs.ctprTweetCount_SelectAllGreaterThanId;
@@ -116,6 +176,7 @@ namespace TwitterAnalyticsDBL.DataObjects
             {
                 command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, null));
                 command.Parameters.Add(new SqlParameter("@Id", SqlDbType.BigInt, 8, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, Id));
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, false, 0, 0, "", DataRowVersion.Proposed, userId));
                 staticConnection.Open();
                 sqlAdapter.Fill(dt);
 
@@ -419,11 +480,54 @@ namespace TwitterAnalyticsDBL.DataObjects
 			}
 		}
 
-		#endregion
 
-		#region member properties
+        ///<Summary>
+        ///Delete one row by primary key(s)
+        ///this method allows the object to delete itself from the table TweetMentions based on its primary key
+        ///</Summary>
+        ///<returns>
+        ///void
+        ///</returns>
+        ///<parameters>
+        ///
+        ///</parameters>
+        public virtual void DeleteAll(string UserId)
+        {
+            SqlCommand command = new SqlCommand();
+            command.CommandText = InlineProcs.ctprTweetCount_DeleteAll;
+            command.CommandType = CommandType.Text;
+            SqlConnection staticConnection = StaticSqlConnection;
+            command.Connection = staticConnection;
 
-		public Int64? Id
+            try
+            {
+                command.Parameters.Add(new SqlParameter("@UserId", SqlDbType.NVarChar, 4000, ParameterDirection.Input, false, 19, 0, "", DataRowVersion.Proposed, (object)UserId ?? (object)DBNull.Value));
+                command.Parameters.Add(new SqlParameter("@ErrorCode", SqlDbType.Int, 4, ParameterDirection.Output, false, 10, 0, "", DataRowVersion.Proposed, _errorCode));
+
+                staticConnection.Open();
+                command.ExecuteNonQuery();
+
+                _errorCode = (Int32)command.Parameters["@ErrorCode"].Value;
+                if (_errorCode > 1)
+                    throw new Exception("procedure ctprTweetMentions_DeleteOne returned error code: " + _errorCode);
+
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                staticConnection.Close();
+                command.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region member properties
+
+        public Int64? Id
 		{
 			get
 			{
@@ -548,8 +652,19 @@ namespace TwitterAnalyticsDBL.DataObjects
 {
 	public partial class InlineProcs
 	{
-		
-		internal static string ctprTweetCount_SelectAll = @"
+        
+        internal static string ctprTweetCount_LatestTweetSpeed = @"
+			-- Select All rows
+			-- selects all rows from the table
+			-- returning the error code if any
+			select top 1 count from tweetmentions  where UserId= @UserId
+            and topic = @Topic
+            order by time desc   
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+        internal static string ctprTweetCount_SelectAll = @"
 			-- Select All rows
 			-- selects all rows from the table
 			-- returning the error code if any
@@ -562,7 +677,8 @@ namespace TwitterAnalyticsDBL.DataObjects
 			,[Retweeted]
 			,[RetweetCount]
 			,[CreatedAt]
-			FROM [dbo].[TweetCount]          
+			FROM [dbo].[TweetCount]     
+            WHERE UserId = @UserId     
 			-- returning the error code if any
 			SELECT @ErrorCode = @@ERROR
 			";
@@ -581,7 +697,7 @@ namespace TwitterAnalyticsDBL.DataObjects
 			,[RetweetCount]
 			,[CreatedAt]
 			FROM [dbo].[TweetCount]
-            WHERE [Id]>@Id
+            WHERE [Id]>@Id and UserId = @UserId
 			-- returning the error code if any
 			SELECT @ErrorCode = @@ERROR
 			";
@@ -687,6 +803,17 @@ namespace TwitterAnalyticsDBL.DataObjects
 			SELECT @ErrorCode = @@ERROR
 			";
 
-	}
+        internal static string ctprTweetCount_DeleteAll = @"
+			-- Delete a row based on the primary key(s)
+			-- delete all matching from the table
+			-- returning the error code if any
+			DELETE [dbo].[TweetCount]
+			WHERE 
+			[UserId] = @UserId
+			-- returning the error code if any
+			SELECT @ErrorCode = @@ERROR
+			";
+
+    }
 }
 #endregion

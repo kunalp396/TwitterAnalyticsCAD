@@ -20,11 +20,9 @@ namespace TwitterAnalyticsCommon
             get
             {
                 if (mLogger == null)
-                {
-                    lock (mLock)
-                    {
+                {                   
                         mLogger = new LoggerFactory<T>();
-                    }
+                   
                 }
                 return mLogger;
             }
@@ -32,7 +30,12 @@ namespace TwitterAnalyticsCommon
         static readonly Dictionary<Type, Func<T>> _dict
              = new Dictionary<Type, Func<T>>();
 
-        public int Count { get { return _dict.Count; } }
+
+        public static int ItemsCount
+        {
+            get { return _dict.Keys.Count; }
+        }
+
 
         public static T Create(Type loggerType)
         {

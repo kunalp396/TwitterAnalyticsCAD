@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0393C9C2-00A1-426F-A837-CB0BAEE86056}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TwitterClient</RootNamespace>
     <AssemblyName>TwitterClient</AssemblyName>
@@ -109,7 +109,6 @@
   <ItemGroup>
     <Compile Include="Entities\EventHubConfig.cs" />
     <Compile Include="EventHubObserver.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +121,10 @@
     <Content Include="Entities\Scenario\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LoggerLibrary\LoggerLibrary.csproj">
+      <Project>{b4b7f6d2-ad57-4faf-afb7-97e9abfe362b}</Project>
+      <Name>LoggerLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TwitterAnalyticsCommon\TwitterAnalyticsCommon.csproj">
       <Project>{22c54712-8933-4bdb-8c76-54910d6beaba}</Project>
       <Name>TwitterAnalyticsCommon</Name>
@@ -130,9 +133,6 @@
       <Project>{06549b3e-8961-40f4-a3f7-74d69bc3f9af}</Project>
       <Name>SentimentAnalytics</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

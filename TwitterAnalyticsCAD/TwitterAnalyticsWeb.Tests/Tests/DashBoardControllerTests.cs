@@ -1,106 +1,99 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TwitterAnalyticsWeb.Controllers;
-using System.Threading.Tasks;
-using TwitterAnalyticsCommon;
-using TwitterAnalyticsWeb.Models;
-using System.Collections.Generic;
-using System.Security.Claims;
 using System.Web.Mvc;
-using Moq;
+using TwitterAnalyticsCommon;
 using System.Web;
-using System.Collections.Specialized;
+using Moq;
 using System.Net;
-using Microsoft.AspNet.Identity;
+using System.Security.Claims;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
-namespace TwitterAnalyticsWeb.Tests.Controllers
+namespace TwitterAnalyticsWeb.Tests.Tests
 {
     [TestClass]
-    public class AccountControllerTest
+    public class DashBoardControllerTests
     {
-
-        public AccountControllerTest()
+        public DashBoardControllerTests()
         {
             SetupLoggers();
         }
-
         void SetupLoggers()
         {
             LoggerFactory<ILogger>.Register(typeof(WebLogger), () => new WebLogger());
             LoggerFactory<ILogger>.Register(typeof(DALLogger), () => new DALLogger());
-        }       
-        
-        AccountController CreateAccountControllerAs(string userName)
-        {
+        }
 
+        DashBoardController CreateDashBoardControllerAs(string userName)
+        {
             var mock = new Mock<ControllerContext>();
             mock.SetupGet(p => p.HttpContext.User.Identity.Name).Returns(userName);
             mock.SetupGet(p => p.HttpContext.Request.IsAuthenticated).Returns(true);
 
-            var controller = new AccountController();
+            var controller = new DashBoardController();
             controller.ControllerContext = mock.Object;
 
             return controller;
         }
-        
+
+
         [TestMethod]
-        public void Login_View_IsAvailable()
-        {            
-
-            // Arrange
-            var _controller = CreateAccountControllerAs("Rohit4@gmail.com");
-            _controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
-
-            // Act
-            var _result = _controller.Login("Account/Login") as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(_result);
-        }
-                
-        [TestMethod]
-        public void Register_View_IsAvailable()
+        public void FilterCriteria_View_IsAvailable()
         {
+            DashBoardController controller = CreateDashBoardControllerAs("Rohit@gmail.com");
+            controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
 
-            // Arrange
-            var _controller = new AccountController();
-            _controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
+            var result =controller.FilterCriteria() as ViewResult;
+            Assert.IsNotNull(result);
 
-            // Act
-            var _result = _controller.Register() as ViewResult;
-
-            // Assert
-            Assert.IsNotNull(_result);
         }
 
 
         [TestMethod]
-        public  void Login_User_Exists()
+        public void Dashboard_FinalChart_View_IsAvailable()
         {
-           
-            //Arrange
-            var dummyUser = new ApplicationUser() { UserName = "rohit@gmail.com" };
-            var mockStore = new Mock<IUserStore<ApplicationUser>>();
-
-            var userManager = new UserManager<ApplicationUser>(mockStore.Object);
-            mockStore.Setup(x => x.CreateAsync(dummyUser))
-                        .Returns(Task.FromResult(IdentityResult.Success));
-
-            mockStore.Setup(x => x.FindByNameAsync(dummyUser.UserName))
-                        .Returns(Task.FromResult(dummyUser));
-
-            //Act
-            Task<IdentityResult> tt = (Task<IdentityResult>)mockStore.Object.CreateAsync(dummyUser);
-            var user = userManager.FindByName("rohit@gmail.com");
-
-            //Assert
-            Assert.AreEqual("rohit@gmail.com", user.UserName);
+            DashBoardController controller = CreateDashBoardControllerAs("Rohit5@gmail.com");
+            controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
 
 
-        }        
+            var result = controller.FinalGraph() as ActionResult;
+            Assert.IsNotNull(result);
+        }
 
+
+        [TestMethod]
+        public void Dashboard_LiveTweet_View_IsAvailable()
+        {
+            DashBoardController controller = CreateDashBoardControllerAs("Rohit3@gmail.com");
+            controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
+
+            var result = controller.LiveTweets() as ActionResult;
+            Assert.IsNotNull(result);
+        }
+
+
+        [TestMethod]
+        public void Dashboard_CountBySentiment_View_IsAvailable()
+        {
+            DashBoardController controller = CreateDashBoardControllerAs("Rohit1@gmail.com");
+            controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
+
+            var result = controller.OverAllSentimentsCount() as ActionResult;
+            Assert.IsNotNull(result);
+        }
+
+
+        [TestMethod]
+        public void Dashboard_TotalTweetCount_View_IsAvailable()
+        {
+            DashBoardController controller = CreateDashBoardControllerAs("Rohit2@gmail.com");
+            controller.ControllerContext = Helpers.GetMvcControllerContextMock(Helpers.GetHttpContextMock().Object).Object;
+
+            var result = controller.OverAllTweets() as ActionResult;
+            Assert.IsNotNull(result);
+        }
     }
-
 
 
     class MockHttpSession : HttpSessionStateBase
@@ -222,7 +215,6 @@ namespace TwitterAnalyticsWeb.Tests.Controllers
             return _identityMock;
         }
     }
-
 
 
 }
