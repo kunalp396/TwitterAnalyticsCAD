@@ -260,6 +260,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\TwitterAnalyticsWeb-Kunal - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\TwitterAnalyticsWeb-Ramesh - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\TwitterAnalyticsWeb.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />

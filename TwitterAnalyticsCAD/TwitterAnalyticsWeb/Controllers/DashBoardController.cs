@@ -101,23 +101,18 @@ namespace TwitterAnalyticsWeb.Controllers
             {
                 IList<BOTweetMentions> listLatestTenTweetMentions = BOTweetMentions.TweetMentionsLatest(User.Identity.GetUserId());
 
-                //List<string> timecollection = new List<string>();
-                //List<object> tweetCountCollection = new List<object>();
-                //List<object> tweetAvgSentimentCollection = new List<object>();
+                
 
                 List<DataPoint> tweetCountSeries = new List<DataPoint>();
                 List<DataPoint> avgSentimentSeries = new List<DataPoint>();
 
                 foreach (BOTweetMentions tweetMention in listLatestTenTweetMentions)
                 {
-                    //timecollection.Add(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture));
-                    //tweetCountCollection.Add(tweetMention.Count.Value);
-                    //tweetAvgSentimentCollection.Add(tweetMention.Avg.Value);
+                    
                     double floattime = float.Parse(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture));
                     floattime = Math.Round(floattime, 2);
                     floattime = Math.Ceiling(floattime * 20) / 20;
 
-                    //double xvalue = Math.Round((float.Parse(tweetMention.Time.ToString("mm.ss", CultureInfo.InvariantCulture))/5.0)*5,2);
                     double xvalue = floattime;
                     double yvalue_tweetCount = tweetMention.Count.Value;
                     double yvalue_avgSentiment = tweetMention.Avg.Value;
@@ -126,10 +121,7 @@ namespace TwitterAnalyticsWeb.Controllers
                     avgSentimentSeries.Add(new DataPoint(xvalue, yvalue_avgSentiment));
                 }
 
-                //var xDataMonths = timecollection.ToArray();
-                //var yDataCounts = tweetCountCollection.ToArray();
-                //var yDataAvgSentimentCounts = tweetAvgSentimentCollection.ToArray();
-                // Highcharts mychart = lineChartSentiment("FinalDashBoard", xDataMonths, yDataCounts, yDataAvgSentimentCounts);
+             
                 ViewBag.TweetCountSeries = JsonConvert.SerializeObject(tweetCountSeries, _jsonSetting);
                 ViewBag.AvgSentimentSeries = JsonConvert.SerializeObject(avgSentimentSeries, _jsonSetting); 
 
@@ -168,34 +160,7 @@ namespace TwitterAnalyticsWeb.Controllers
                 }
 
 
-                //IList<BOTweetCount> listLatestTenTweetCount = BOTweetCount.TweetCountCollection(User.Identity.GetUserId());
-
-                //Dictionary<string, int> allTweetsCountbyTopic = new Dictionary<string, int>();
-                //Dictionary<string, Dictionary<string, int>> allSentimentsbyTopic = new Dictionary<string, Dictionary<string, int>>();
-
-                //foreach (BOTweetCount tweetCount in listLatestTenTweetCount)
-                //{
-                //    if (!allTweetsCountbyTopic.ContainsKey(tweetCount.Topic.ToUpper()))
-                //    {
-                //        allTweetsCountbyTopic.Add(tweetCount.Topic.ToUpper(), 0);
-                //    }
-                //    else
-                //    {
-                //        allTweetsCountbyTopic[tweetCount.Topic.ToUpper()] += 1;
-                //    }
-
-                //};
-
-                ////var xDataMonths = allTweetsCountbyTopic.Keys.ToArray();
-                ////var yDataCounts = allTweetsCountbyTopic.Values.Select(count => (object)count).ToArray();
-
-                //List<DataPoint> barcharTopicsCount = new List<DataPoint>();
-
-                ////Highcharts overAllSentimentChart = barChartTweetsByTopic("OverAllTweets", xDataMonths, yDataCounts);
-                //foreach(string key in allTweetsCountbyTopic.Keys)
-                //{
-                //    barcharTopicsCount.Add(new DataPoint(allTweetsCountbyTopic[key], key));
-                //}
+               
 
                 ViewBag.TopicSpeeder = JsonConvert.SerializeObject(tweetSpeeder, _jsonSetting);
 
@@ -277,9 +242,7 @@ namespace TwitterAnalyticsWeb.Controllers
                 ViewBag.NegativeSentimentbyTopic = JsonConvert.SerializeObject(negativeSentimentbyTopic, _jsonSetting);
                 ViewBag.PositiveSentimentbyTopic = JsonConvert.SerializeObject(positiveSentimentbyTopic, _jsonSetting);
                 ViewBag.NeutralSentimentbyTopic = JsonConvert.SerializeObject(neutralSentimentbyTopic, _jsonSetting);
-                //logger.Log(negativeSentimentbyTopic.Count+" : "+ 
-                //    positiveSentimentbyTopic.Count + " : "+ neutralSentimentbyTopic.Count+" : "+ allSentimentsbyTopic.Keys.Count);
-                //Highcharts overAllSentimentChart = barChartSentimentsByCount("OverAllSentimentsCount", topics, allSentimentsbyTopic);
+               
 
                 return PartialView();
             }
